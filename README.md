@@ -1,3 +1,7 @@
+<span style="color:red">**! THE CODE WILL BE UPLOADED SOON !**</span>
+
+
+
 # DMSA_LiDAR_SLAM
 DMSA LiDAR SLAM is a robust and accurate package for LiDAR and IMU based mapping. First point clouds within a sliding time window are optimized conjointly with so called static points from the map and IMU measurements. When a new keyframe is added to the map, related keyframes are optimized. Keyframes are stored in a ring buffer, therefore old keyframes are deleted from a certain map size.
 For point cloud alignment, **Dense Multi Scan Adjustment** (DMSA) is used.
@@ -19,7 +23,7 @@ The package can work with LiDAR data from the following manufacturers:
 - Velodyne
 - Robosense
 
-**!!! The ROS drivers must be configured in such a way that time stamp and ring id are provided for each point !!!**
+**! The ROS drivers must be configured in such a way that time stamp and ring id are provided for each point !**
 
 ## Prerequisites
 The package was developed with the following packages:
@@ -41,7 +45,9 @@ Compatibility with other Ubuntu/ROS/Eigen versions should be possible, but has n
 ### 4. Compile
 `cd .. && catkin_make`
 
-## Run 
+## Setup for Hilti dataset
+
+## Setup for Newer College dataset 
 
 ## Setup for own recordings:
 ### 1. Setup rosbag directory in config
