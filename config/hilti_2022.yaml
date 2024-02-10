@@ -1,0 +1,43 @@
+# input:
+
+bag_dirs: "/home/david/Rosbags/Hilti/Additional_Seq/exp04_construction_upper_level.bag"
+#bag_dirs: "/home/david/Rosbags/Hilti/Additional_Seq/exp06_construction_upper_level_3.bag"
+#bag_dirs: "/home/david/Rosbags/Hilti/Benchmark_seq/exp03_construction_stairs.bag"
+#bag_dirs: "/home/david/Rosbags/Hilti/Additional_Seq/exp14_basement_2.bag"
+#bag_dirs: "/home/david/Rosbags/Hilti/Additional_Seq/exp18_corridor_lower_gallery_2.bag"
+
+# output: save resulting poses and point cloud
+result_dir: "/home/david/optim"
+
+# open viewer for live visualization
+live_view: true
+
+## LiDAR SETTINGS
+
+# sensor {"hesai","ouster","robosense","velodyne","unknown"}
+sensor: "hesai"
+lidar_topic: "/hesai/pandar"
+
+## IMU SETTINGS
+use_imu: true
+imu_topic: "/alphasense/imu"
+
+# IMU sensor noise (does not need to be adjusted in most cases)
+sigma_gyr: 0.03
+sigma_acc: 0.4
+
+# clock time shift
+timeshift_lidar2imu: 0.000
+
+# extrinsics imu2lidar
+
+# rot quaternion
+q_x: 0.7071068
+q_y: -0.7071068
+q_z: 0.0
+q_w: 0.0
+
+# translation
+t_x: -0.001
+t_y: -0.00855
+t_z: 0.055

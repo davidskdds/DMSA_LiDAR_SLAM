@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+
+<launch>
+
+  
+  <node name="dmsa_slam_ros" pkg="dmsa_slam_ros" type="dmsa_slam_ros" output="screen">
+  <rosparam command="load" file="$(find dmsa_slam_ros)/config/slam_settings.yaml" />
+  <rosparam command="load" file="$(find dmsa_slam_ros)/config/hilti_2022.yaml" />
+</node>
+
+
+</launch>

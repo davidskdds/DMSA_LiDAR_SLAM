@@ -1,0 +1,40 @@
+### Process your own rosbag/s ###
+
+# input (one rosbag path or multiple, diveded by space)
+bag_dirs: "/path/to/rosbag.bag"
+
+# output: save resulting poses and point cloud in directory (recommended: use home directory to do not run into permission issues)
+result_dir: "/home/USERNAME"
+
+# true: live viewer window will open (pcl-viewer), false: no live view
+live_view: true
+
+## LiDAR SETTINGS
+
+# sensor type {"hesai","ouster","robosense","velodyne","unknown"}
+sensor: "ouster"
+lidar_topic: "/ouster/points"
+
+## IMU SETTINGS
+use_imu: true
+imu_topic: "/ouster/imu"
+
+# IMU sensor noise (does not need to be adjusted in most cases)
+sigma_gyr: 0.03
+sigma_acc: 0.4
+
+# clock time shift (does not need to be adjusted in most cases)
+timeshift_lidar2imu: 0.000
+
+# extrinsics imu2lidar
+
+# rot quaternion
+q_x: 0.0
+q_y: 0.0
+q_z: 0.0
+q_w: 1.0
+
+# translation
+t_x: 0.0
+t_y: 0.0
+t_z: 0.0
