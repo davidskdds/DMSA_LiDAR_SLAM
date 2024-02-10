@@ -1,0 +1,79 @@
+## SLAM setting ##
+
+## GENERAL
+
+# downsampling settings
+max_num_points_per_scan: 3000
+min_distance_ds: 30.0
+
+# points with a smaller distance are removed
+min_dist: 0.1
+
+# minimum number of points for valid gaussian
+min_num_points_gauss: 10
+
+# keyframe conditions
+dist_new_keyframe: 5.0
+min_overlap_new_keyframe: 0.75
+
+## SLIDING WINDOW CONTINOUS TRAJECTORY SETTINGS
+
+# number of iterations
+num_iter_sliding_window_optim: 8
+
+# number of clouds for submap optimization 5-10
+num_clouds_submap: 5
+
+# number of control points per scan for submap trajectory
+numControlPoints: 6
+
+# decay rate for optimization
+decay_rate_sw: 0.8
+
+# imu weight in sliding window optimization
+imu_factor_weight_submap: 0.0001
+
+# gains in optimization
+alpha_sliding_window_imu: 0.07
+alpha_sliding_window_no_imu: 0.3
+
+# maximum step size in optimization
+max_step_sliding_window_imu: 0.01
+max_step_sliding_window_no_imu: 0.2
+
+oldest_k_keyframes_as_static_points: 100
+
+## KEYFRAME OPTIMIZATION
+
+# true: keyframes will be optimized / false: no keyframe optimization
+optimize_sliding_window_keyframes: true
+
+# true: select parameter set with highest score / false: select final parameter set after last optimization step
+select_best_set_key: true
+
+# minimum number of points in voxel to use set in optimization
+min_num_points_gauss_key: 15
+
+# gain in optimization
+alpha_keyframe_optim: 0.2
+
+# number of iterations
+num_iter_keyframe_optim: 50
+
+# decay rate of gain in keyframe optimization
+decay_rate_key: 0.8
+
+# epsilon for stop condition in keyframe optimization
+epsilon_keyframe_opt: 0.0001
+
+# activate / deactivate gravity and odometry factor
+use_gravity_term_in_keyframe_opt: true
+use_odometry_term_in_keyframe_opt: false
+
+# balacing weights on the factors
+balancing_factor_gravity: 1.0
+balancing_factor_odometry: 1000.0
+
+# defines keyframe buffer size
+last_n_keyframes_for_optim: 100
+dist_static_points_keyframe: 30.0
