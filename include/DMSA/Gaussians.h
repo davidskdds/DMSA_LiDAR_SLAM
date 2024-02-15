@@ -94,14 +94,9 @@ public:
     VectorXi numPointsPerSet;
     VectorXf rebalancingWeights;
     VectorXf obervationWeights;
-    VectorXf infoDetsPerSet;
 
-    float sumOfInfoNorms;
-    float sumOfWeightedInfoNorms;
-    float sumOfCovNorms;
+
     float score;
-    float realDifferentialEntropy;
-    int numSkips = 0;
 
     Matrix3f InformationBalance;
 
@@ -122,9 +117,8 @@ public:
         numPointsPerSet.setZero();
         rebalancingWeights.resize(maxSets);
         obervationWeights.resize(maxSets);
-        infoDetsPerSet.resize(maxSets);
         obervationWeights.setZero();
-        infoDetsPerSet.setZero();
+
 
         numPointSets = 0;
         numPoints = 0;
@@ -135,17 +129,12 @@ public:
     {
         numPointsPerSet.setZero();
         obervationWeights.setZero();
-        infoDetsPerSet.setZero();
 
         numPointSets = 0;
         numPoints = 0;
 
-        sumOfInfoNorms = 0.000;
-        sumOfCovNorms = 0.000;
-        sumOfWeightedInfoNorms = 0.000;
         score = 0.000;
-        realDifferentialEntropy = 0.000;
-        numSkips = 0;
+
     }
 
     void addPointSet(std::vector<int> &ids, MatrixX3f &subset, float observationWeight = 1.0)
@@ -162,7 +151,6 @@ public:
             numPointsPerSet.conservativeResize(maxSets);
             rebalancingWeights.conservativeResize(maxSets);
             obervationWeights.conservativeResize(maxSets);
-            infoDetsPerSet.conservativeResize(maxSets);
         }
 
         MatrixXf centered = subset.rowwise() - subset.colwise().mean();
@@ -177,15 +165,6 @@ public:
 
         // save information matrix
         infoMats[numPointSets] = cov.inverse();
-
-        sumOfInfoNorms = sumOfInfoNorms + infoMats[numPointSets].norm();
-
-        // sumOfWeightedInfoNorms = sumOfWeightedInfoNorms + (float) connectedPointIds[k].size() * infoMats[k].norm();
-
-        realDifferentialEntropy = realDifferentialEntropy + log(cov.determinant());
-
-        // limit precision matrix
-        // limit_prec(infoMats[numPointSets]);
 
         // save observation weight
         obervationWeights(numPointSets) = observationWeight;
