@@ -20,19 +20,6 @@
 using namespace Eigen;
 using namespace pcl;
 
-std::mutex viewer_mutex;
-std::mutex map_mutex;
-
-void updateWindow(pcl::visualization::PCLVisualizer *viewer_ptr)
-{
-    while (true)
-    {
-        viewer_mutex.lock();
-        viewer_ptr->spinOnce(1, true);
-        viewer_mutex.unlock();
-        usleep(10000);
-    }
-}
 
 dmsa_slam_ros::dmsa_slam_ros()
 {
@@ -78,9 +65,6 @@ dmsa_slam_ros::dmsa_slam_ros()
     std::cout << "bag_dirs: " << bag_dirs << std::endl;
 
     bagnames = splitIntoWords(bag_dirs);
-
-    nh.getParam("live_view", config.liveView);
-    std::cout << "live_view: " << config.liveView << std::endl;
 
     // init transform in imu frame
     imu2lidar = Matrix4f::Identity();
@@ -214,7 +198,6 @@ dmsa_slam_ros::dmsa_slam_ros()
         config.last_n_keyframes_for_optim = 5;
         config.num_iter_keyframe_optim = 1;
         config.num_iter_sliding_window_optim = 5;
-        config.liveView = true;
         config.num_control_points = 10;
         config.use_imu = true;
         config.max_num_points_per_scan = 1000;
@@ -235,22 +218,16 @@ dmsa_slam_ros::dmsa_slam_ros()
     DmsaSLAMObj.config.lidarToImuTform = lidar2imu;
     config.lidarToImuTform = lidar2imu;
 
-    if (config.liveView)
-    {
-        // init viewer on seperate thread
-        viewer = new pcl::visualization::PCLVisualizer("DMSA-SLAM Viewer (green: points from current sliding window, white: active map points, blue: inactive map points, red: trajectory)");
-
-        std::thread t1(updateWindow, viewer);
-        t1.detach();
-    }
+    pubMap = nh.advertise<sensor_msgs::PointCloud2>("/dmsa_slam/map", 1);
+    pubSubmap = nh.advertise<sensor_msgs::PointCloud2>("/dmsa_slam/submap", 1);
+    pubPose = nh.advertise<geometry_msgs::PoseStamped>("/dmsa_slam/pose", 1);
+    pubTraj = nh.advertise<sensor_msgs::PointCloud2>("/dmsa_slam/traj", 1);
 
     DmsaSLAMObj = DmsaSlam(config);
 }
 
 dmsa_slam_ros::~dmsa_slam_ros()
 {
-    if (config.liveView)
-        delete viewer;
 }
 
 void dmsa_slam_ros::spin()
@@ -335,6 +312,58 @@ void dmsa_slam_ros::callbackImuData(const sensor_msgs::Imu::ConstPtr &msg)
     DmsaSLAMObj.processImuMeasurements(accVec, angVelVec, stamp);
 }
 
+void dmsa_slam_ros::publishPointCloudsAndPose()
+{
+    if (DmsaSLAMObj.KeyframeMap.keyframeDataBuffer.getNumElements() <= 0) return;
+
+    sensor_msgs::PointCloud2 mapMsg,submapMsg, trajMsg;
+
+    PointCloud<PointXYZ> currPosition;
+
+    currPosition.points.resize(1);
+    currPosition.points[0].x = DmsaSLAMObj.currTraj->SparsePoses.globalPoses.Translations(0,0);
+    currPosition.points[0].y = DmsaSLAMObj.currTraj->SparsePoses.globalPoses.Translations(1,0);
+    currPosition.points[0].z = DmsaSLAMObj.currTraj->SparsePoses.globalPoses.Translations(2,0);
+
+    pcl::toROSMsg(DmsaSLAMObj.currTraj->globalPoints, submapMsg);
+    pcl::toROSMsg(currPosition, trajMsg);
+
+    submapMsg.header.frame_id = "map";
+    trajMsg.header.frame_id = "map";
+
+    pubSubmap.publish(submapMsg);
+    pubTraj.publish(trajMsg);
+
+    geometry_msgs::PoseStamped currPose;
+
+    currPose.pose.position.x = DmsaSLAMObj.currTraj->SparsePoses.globalPoses.Translations(0,0);
+    currPose.pose.position.y = DmsaSLAMObj.currTraj->SparsePoses.globalPoses.Translations(1,0);
+    currPose.pose.position.z = DmsaSLAMObj.currTraj->SparsePoses.globalPoses.Translations(2,0);
+
+    Matrix3d R = axang2rotm(DmsaSLAMObj.currTraj->SparsePoses.globalPoses.Orientations.col(0));
+    Quaterniond q(R);
+
+    currPose.pose.orientation.x = q.x();
+    currPose.pose.orientation.y = q.y();
+    currPose.pose.orientation.z = q.z();
+    currPose.pose.orientation.w = q.w();
+
+    currPose.header.frame_id = "map";
+    pubPose.publish(currPose);
+
+    // publish map not every cycle
+    if (DmsaSLAMObj.pcBuffer->getNumUpdates() % 20 == 0)
+    {
+        pcl::toROSMsg(DmsaSLAMObj.KeyframeMap.globalPoints, mapMsg);
+
+        mapMsg.header.frame_id = "map";
+
+        pubMap.publish(mapMsg);
+    }
+
+    ros::spinOnce();
+}
+
 void dmsa_slam_ros::callbackPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg)
 {
     PointCloudPlus::Ptr newPC(new PointCloudPlus);
@@ -385,7 +414,7 @@ void dmsa_slam_ros::callbackPointCloud(const sensor_msgs::PointCloud2::ConstPtr 
             memcpy(&relStampNano, &msg->data[arrayPosition + msg->fields[4].offset], sizeof(uint32_t));
             memcpy(&ring_tmp8, &msg->data[arrayPosition + msg->fields[6].offset], sizeof(uint8_t));
 
-            tmpStampDouble = stampMsg + 1e-9f * (double)relStampNano;
+            tmpStampDouble = stampMsg + 1e-9 * (double)relStampNano;
 
             newPC->at(k).stamp = tmpStampDouble;
             newPC->at(k).id = (int)ring_tmp8;
@@ -421,78 +450,25 @@ void dmsa_slam_ros::callbackPointCloud(const sensor_msgs::PointCloud2::ConstPtr 
     /* PROCESS POINT CLOUD IN DMSA SLAM */
     DmsaSLAMObj.processPointCloud(newPC);
 
-    if (config.liveView && DmsaSLAMObj.KeyframeMap.keyframeDataBuffer.getNumElements() > 0)
+    // publish in ros
+    publishPointCloudsAndPose();
+
+    // save data in directory
+    if (saveMap && DmsaSLAMObj.pcBuffer->getNumUpdates() % 20 == 0 && DmsaSLAMObj.KeyframeMap.keyframeDataBuffer.getNumUpdates() > 0)
     {
+        // save poses
+        DmsaSLAMObj.savePoses(result_dir);
 
-        viewer_mutex.lock();
-
-        // cloud
-        pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
-
-        Eigen::Matrix3Xd &Poses = DmsaSLAMObj.currTraj->DenseGlobalPoses.Translations;
-        cloud->resize(Poses.cols());
-
-        for (int i = 0; i < Poses.cols(); i++)
+        // Save the cloud to a .pcd file
+        std::string filename = result_dir + "/PointCloud.pcd";
+        if (io::savePCDFileASCII(filename, DmsaSLAMObj.KeyframeMap.globalPoints) == -1)
         {
-            pcl::PointXYZ point;
-            point.x = Poses(0, i);
-            point.y = Poses(1, i);
-            point.z = Poses(2, i);
-            cloud->points[i] = point;
+            PCL_ERROR("Failed to save PCD file\n");
         }
-
-        pcl::visualization::PointCloudColorHandlerCustom<pcl::PointXYZ> single_colorR(cloud, 255, 0, 0);
-        single_colorR = pcl::visualization::PointCloudColorHandlerCustom<pcl::PointXYZ>(cloud, 255, 0, 0);
-
-        pcl::visualization::PointCloudColorHandlerCustom<PointStampId> single_colorG(DmsaSLAMObj.currTraj->globalPoints.makeShared(), 0, 255, 0);
-        single_colorG = pcl::visualization::PointCloudColorHandlerCustom<PointStampId>(DmsaSLAMObj.currTraj->globalPoints.makeShared(), 0, 255, 0);
-
-        pcl::visualization::PointCloudColorHandlerCustom<PointStampId> single_colorW(DmsaSLAMObj.KeyframeMap.activePoints, 255, 255, 255);
-        single_colorW = pcl::visualization::PointCloudColorHandlerCustom<PointStampId>(DmsaSLAMObj.KeyframeMap.activePoints, 255, 255, 255);
-
-        pcl::visualization::PointCloudColorHandlerCustom<PointNormal> single_colorB(DmsaSLAMObj.KeyframeMap.globalPoints.makeShared(), 0, 0, 255);
-        single_colorB = pcl::visualization::PointCloudColorHandlerCustom<PointNormal>(DmsaSLAMObj.KeyframeMap.globalPoints.makeShared(), 0, 0, 255);
-
-        viewer->setBackgroundColor(0, 0, 0);
-
-        viewer->removePointCloud("cloud");
-        viewer->addPointCloud(DmsaSLAMObj.currTraj->globalPoints.makeShared(), single_colorG, "cloud");
-
-        viewer->removePointCloud("cloudG");
-        viewer->addPointCloud(DmsaSLAMObj.KeyframeMap.globalPoints.makeShared(), single_colorB, "cloudG");
-
-        viewer->removePointCloud("path");
-        viewer->addPointCloud(cloud, single_colorR, "path");
-
-        viewer->removePointCloud("cloudW");
-        viewer->addPointCloud(DmsaSLAMObj.KeyframeMap.activePoints, single_colorW, "cloudW");
-
-        if (saveMap && DmsaSLAMObj.pcBuffer->getNumUpdates() % 20 == 0)
-        {
-            // save poses
-            DmsaSLAMObj.savePoses(result_dir);
-
-            // Save the cloud to a .pcd file
-            std::string filename = result_dir + "/PointCloud.pcd";
-            if (io::savePCDFileASCII(filename, DmsaSLAMObj.KeyframeMap.globalPoints) == -1)
-            {
-                PCL_ERROR("Failed to save PCD file\n");
-            }
-        }
-
-        if (DmsaSLAMObj.pcBuffer->getNumUpdates() % 100 == 0)
-        {
-            Ref<Vector3d> currPos = DmsaSLAMObj.currTraj->SparsePoses.globalPoses.Translations.col(0);
-
-            viewer->setCameraPosition(currPos(0) + 1.0, currPos(1) + 1.0, currPos(2) + 100.0, currPos(0), currPos(1), currPos(2), 0.0, 0.0, 1.0);
-        }
-
-        viewer_mutex.unlock();
-
     }
+
+
 
     // update last stamp
     lastPcMsgStamp = stampMsg;
-
-    return;
 }

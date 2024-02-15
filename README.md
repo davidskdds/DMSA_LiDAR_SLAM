@@ -5,14 +5,14 @@ For point cloud alignment, **Dense Multi Scan Adjustment** (DMSA) is used.
 **The use of IMU data is not mandatory, but recommended.**
 
 <figure>
-<img src="./doc/basement_bv.png" alt="drawing" width="600"/>
+<img src="./doc/basement_bv.png" alt="drawing" width="700"/>
 <figcaption>Fig.1 - Resulting keyframe point cloud of sequence exp14 Basement of the Hilti-Oxford Dataset. The estimated trajectory is marked with a red line.</figcaption>
 </figure>
 
 
 <figure>
 <p align='left'>
-    <img src="./doc/stairs.gif" alt="drawing" width="600"/>
+    <img src="./doc/stairs.gif" alt="drawing" width="700"/>
 </p>
 <figcaption>Fig.2 - Running DMSA SLAM on the stairs sequence of the Newer College Dataset.</figcaption>
 </figure>
@@ -101,15 +101,6 @@ The parameter could be set like this:
 
 `result_dir: "/home/USERNAME"`
 
-### 3. Live Viewer
-If the parameter `live_view` in the .yaml file is set true, a live viewer opens directly after starting the processing:
-<figure>
-<img src="./doc/live_viewer.png" alt="drawing" width="600"/>
-<figcaption>Fig.3 - DMSA-SLAM Viewer.</figcaption>
-</figure>
-
-The viewer is based on the [Point Cloud Library](https://pcl.readthedocs.io/projects/tutorials/en/latest/pcl_visualizer.html). If some pcl_viewer error occurs, it is recommended to set `live_view` to false.
-
 
 ### 4. LiDAR and IMU Settings (not necessary for benchmark dataset configurations like Hilti and Newer College)
 Regarding the LiDAR the `sensor` type {"hesai","ouster","robosense","velodyne","unknown"} and the `lidar_topic` must be specified in the .yaml file.
@@ -122,3 +113,10 @@ For using an IMU the `imu_topic` and the extrinsics must be specified (see .yaml
 
 ### 2. Run Package:
 `roslaunch dmsa_slam_ros hilti_2022.launch`
+
+After the package is started, RViz opens and displays the progress of the processing. In RViz the current pose (white), the processed submap point clouds, map points (grey) and the trajectory (red) are shown.
+
+<figure>
+<img src="./doc/rviz_live.png" alt="drawing" width="700"/>
+<figcaption>Fig.3 - DMSA-SLAM in RViz.</figcaption>
+</figure>

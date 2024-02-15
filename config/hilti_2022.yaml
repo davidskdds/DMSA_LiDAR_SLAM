@@ -1,16 +1,13 @@
 # input:
 
-bag_dirs: "/home/david/Rosbags/Hilti/Additional_Seq/exp04_construction_upper_level.bag"
+#bag_dirs: "/home/david/Rosbags/Hilti/Additional_Seq/exp04_construction_upper_level.bag"
 #bag_dirs: "/home/david/Rosbags/Hilti/Additional_Seq/exp06_construction_upper_level_3.bag"
 #bag_dirs: "/home/david/Rosbags/Hilti/Benchmark_seq/exp03_construction_stairs.bag"
-#bag_dirs: "/home/david/Rosbags/Hilti/Additional_Seq/exp14_basement_2.bag"
+bag_dirs: "/home/david/Rosbags/Hilti/Additional_Seq/exp14_basement_2.bag"
 #bag_dirs: "/home/david/Rosbags/Hilti/Additional_Seq/exp18_corridor_lower_gallery_2.bag"
 
 # output: save resulting poses and point cloud
 result_dir: "/home/david/optim"
-
-# open viewer for live visualization
-live_view: true
 
 ## LiDAR SETTINGS
 

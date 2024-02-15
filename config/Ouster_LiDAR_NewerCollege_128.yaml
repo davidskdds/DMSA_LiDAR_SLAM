@@ -10,8 +10,6 @@ imu_topic: "/os_cloud_node/imu"
 # pose format: [timestamp_s tx ty tz qx qy qz qw]
 result_dir: "/home/david/optim"
 
-# open viewer for live visualization
-live_view: true
 
 ## LiDAR config ##
 

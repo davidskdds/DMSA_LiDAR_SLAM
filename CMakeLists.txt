@@ -22,6 +22,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
+  geometry_msgs
   tf
   pcl_conversions)
 
@@ -44,7 +45,7 @@ else()
 endif()
 
 catkin_package(
-    CATKIN_DEPENDS roscpp rospy std_msgs tf pcl_conversions sensor_msgs rosbag
+    CATKIN_DEPENDS roscpp rospy std_msgs tf pcl_conversions sensor_msgs geometry_msgs rosbag
 )
 
 include_directories(

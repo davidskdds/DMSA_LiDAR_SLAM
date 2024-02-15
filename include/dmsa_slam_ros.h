@@ -9,6 +9,7 @@
 #include "ros/ros.h"
 #include <sensor_msgs/Imu.h>
 #include <sensor_msgs/PointCloud2.h>
+#include <geometry_msgs/PoseStamped.h>
 #include "DMSA/DmsaSlam.h"
 #include <string>
 #include <Eigen/Core>
@@ -61,7 +62,12 @@ private:
   void callbackImuData(const sensor_msgs::Imu::ConstPtr &msg);
   void callbackPointCloud(const sensor_msgs::PointCloud2::ConstPtr &msg);
 
-  pcl::visualization::PCLVisualizer *viewer;
+  void publishPointCloudsAndPose();
+
+  ros::Publisher pubMap;
+  ros::Publisher pubSubmap;
+  ros::Publisher pubPose;
+  ros::Publisher pubTraj;
 
   Eigen::Matrix4f lidar2imu;
   Eigen::Matrix4f imu2lidar;

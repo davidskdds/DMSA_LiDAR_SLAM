@@ -19,7 +19,6 @@ struct Config
     int n_clouds = 5;
     int num_control_points = 6;
     std::string sensor = "hesai";
-    bool liveView = true;
     bool optimize_sliding_window_keyframes = true;
     int last_n_keyframes_for_optim = 10;
     int max_num_points_per_scan = 3000;
