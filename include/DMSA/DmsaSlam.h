@@ -57,7 +57,6 @@ public:
 
     OutputManagement Output;
 
-public:
     DmsaSlam(Config &inputConf) : config(inputConf), currTraj(new ContinuousTrajectory()), oldTraj(new ContinuousTrajectory()), pcBuffer(new PointCloudBuffer())
     {
         pcBuffer->init(config.n_clouds);

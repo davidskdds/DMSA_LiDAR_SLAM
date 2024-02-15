@@ -12,8 +12,6 @@
 #include <iostream>
 #include <memory>
 #include <eigen3/Eigen/Eigenvalues>
-#include "PointCloudPlus.h"
-
 #include "Gaussians.h"
 #include "OptimizablePointSet.h"
 

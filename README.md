@@ -54,6 +54,18 @@ The package was developed with the following packages:
 
 Compatibility with other Ubuntu/ROS/Eigen versions should be possible, but has not been tested.
 
+### 1. Install ROS Noetic
+Instructions for installing ROS Noetic can be found [here](http://wiki.ros.org/noetic/Installation). 
+
+### 2. How to install Eigen 3.4.0
+Unfortunately, Eigen 3.4.0 is not available via apt package management on Ubuntu 20.04. You can download the latest Eigen version from [here](https://eigen.tuxfamily.org/index.php?title=Main_Page) and follow the instructions.
+
+You can also use the provided shell script, that will update your Eigen version to 3.4.0 on Ubuntu 20.04:
+
+`sh helpers/updateEigenUbuntu20.04.sh`
+
+
+
 ## Installation
 
 ### 1. Create workspace:

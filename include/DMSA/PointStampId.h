@@ -16,7 +16,6 @@
 #include <pcl/octree/octree_pointcloud.h>
 #include <pcl/octree/octree_search.h>
 #include <pcl_conversions/pcl_conversions.h>
-#include <pcl/point_types.h>
 #include <pcl/PCLPointCloud2.h>
 #include <pcl/conversions.h>
 #include <pcl_ros/transforms.h>
@@ -25,10 +24,7 @@
 #include <pcl/common/transforms.h>
 #include <math.h>
 #include <pcl/features/normal_3d.h>
-#include <pcl/point_types.h>
 #include <pcl/visualization/cloud_viewer.h>
-#include <pcl/octree/octree_search.h>
-#include <pcl/features/normal_3d.h>
 #include <pcl/features/normal_3d_omp.h>
 
 #ifndef POINTSTAMPID_H

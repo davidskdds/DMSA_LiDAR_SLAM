@@ -8,10 +8,9 @@
 
 #include <eigen3/Eigen/Core>
 #include "OptimizablePointSet.h"
-#include "PointCloudBuffer.h"
 #include "ConsecutivePoses.h"
 #include "KeyframeData.h"
-#include "PointStampId.h"
+
 
 #ifndef MAPMANAGEMENT_H
 #define MAPMANAGEMENT_H

@@ -9,7 +9,6 @@
 #include <vector>
 #include <eigen3/Eigen/Dense>
 #include <eigen3/Eigen/Core>
-#include "PointStampId.h"
 
 #ifndef GAUSSIANS_H
 #define GAUSSIANS_H

@@ -8,7 +8,7 @@
 
 #include "OptimizablePointSet.h"
 #include "ConsecutivePoses.h"
-#include "Config.h"
+
 #include <vector>
 #include "PointCloudBuffer.h"
 #include "ImuBuffer.h"

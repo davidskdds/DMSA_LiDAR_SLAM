@@ -7,7 +7,6 @@
  */
 
 #include <eigen3/Eigen/Core>
-#include "PointCloudPlus.h"
 
 #ifndef KEYFRAMEDATA_H
 #define KEYFRAMEDATA_H
