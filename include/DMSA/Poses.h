@@ -75,6 +75,18 @@ public:
         Translations.block(0, 1, 3, Translations.cols() - 1) = params.tail(Translations.cols() * Translations.rows() - 3).reshaped(Translations.rows(), Translations.cols() - 1);
     }
 
+    void getTranslationParamsAsVector(VectorXd &params)
+    {
+        params.conservativeResize( Translations.cols() * Translations.rows() - 3);
+
+        params << Translations.block(0, 1, 3, Translations.cols() - 1).reshaped(Translations.cols() * Translations.rows() - 3, 1);
+    }
+
+    void setTranslationParamsFromVector(const VectorXd &params)
+    {
+         Translations.block(0, 1, 3, Translations.cols() - 1) = params.reshaped(Translations.rows(), Translations.cols() - 1);
+    }
+
     void getParamsAsVectorFull(VectorXd &params)
     {
         params.conservativeResize(Orientations.cols() * Orientations.rows() + Translations.cols() * Translations.rows());

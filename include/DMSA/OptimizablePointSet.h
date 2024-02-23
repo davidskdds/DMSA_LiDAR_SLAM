@@ -32,8 +32,7 @@ public:
     virtual void updateGlobalPoints() { std::cerr << "virtual void updateGlobalPoints() is undefined"; }
 
     virtual int updateAdditionalErrors()
-    {
-        std::cerr << "virtual int updateAdditionalErrors() is undefined";
+    {   // return number of error values
         return 0;
     }
 

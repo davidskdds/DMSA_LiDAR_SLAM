@@ -70,6 +70,7 @@ public:
     {
         relativePoses.resize(n);
         globalPoses.resize(n);
+        numPoses = n;
     }
 };
 

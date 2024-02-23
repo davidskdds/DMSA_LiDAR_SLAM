@@ -19,6 +19,24 @@ public:
     using Ptr = boost::shared_ptr<PointCloudPlus>;
     using ConstPtr = boost::shared_ptr<const PointCloudPlus>;
 
+    double getMinStamp()
+    {
+        double stamp = points[0].stamp;
+
+        for (auto &point : points) if (point.stamp < stamp) stamp = point.stamp;
+
+        return stamp;
+    }
+
+    double getMaxStamp()
+    {
+        double stamp = points[0].stamp;
+
+        for (auto &point : points) if (point.stamp > stamp) stamp = point.stamp;
+
+        return stamp;
+    }
+
     void addStaticPoints(const pcl::PointCloud<pcl::PointNormal> &pcStatic)
     {
         int currSz = points.size();
