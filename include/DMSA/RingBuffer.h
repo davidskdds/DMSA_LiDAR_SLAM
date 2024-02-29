@@ -6,13 +6,13 @@
  * this file. If not, please write to: davidskuddis@web.de, or visit: https://opensource.org/license/mit/
  */
 
+#ifndef RINGBUFFER_H
+#define RINGBUFFER_H
+
 #include <vector>
 #include <limits>
 #include <iostream>
 #include <memory>
-
-#ifndef RINGBUFFER_H
-#define RINGBUFFER_H
 
 using namespace std;
 

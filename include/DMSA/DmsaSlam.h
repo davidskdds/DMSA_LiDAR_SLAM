@@ -6,6 +6,9 @@
  * this file. If not, please write to: davidskuddis@web.de, or visit: https://opensource.org/license/mit/
  */
 
+#ifndef DMSASLAM_H
+#define DMSASLAM_H
+
 #include <eigen3/Eigen/Core>
 #include <memory>
 #include <chrono>
@@ -17,9 +20,6 @@
 #include "DmsaOptimizer.h"
 #include "helpers.h"
 #include "OutputManagement.h"
-
-#ifndef DMSASLAM_H
-#define DMSASLAM_H
 
 using namespace pcl;
 using namespace std;

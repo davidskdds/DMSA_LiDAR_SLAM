@@ -6,11 +6,11 @@
  * this file. If not, please write to: davidskuddis@web.de, or visit: https://opensource.org/license/mit/
  */
 
-#include "Poses.h"
-#include "helpers.h"
-
 #ifndef CONSECUTIVEPOSES_H
 #define CONSECUTIVEPOSES_H
+
+#include "Poses.h"
+#include "helpers.h"
 
 class ConsecutivePoses
 {

@@ -6,6 +6,9 @@
  * this file. If not, please write to: davidskuddis@web.de, or visit: https://opensource.org/license/mit/
  */
 
+#ifndef POINTSTAMPID_H
+#define POINTSTAMPID_H
+
 #define PCL_NO_PRECOMPILE
 
 #include <pcl/pcl_macros.h>
@@ -26,9 +29,6 @@
 #include <pcl/features/normal_3d.h>
 #include <pcl/visualization/cloud_viewer.h>
 #include <pcl/features/normal_3d_omp.h>
-
-#ifndef POINTSTAMPID_H
-#define POINTSTAMPID_H
 
 struct PointStampId
 {

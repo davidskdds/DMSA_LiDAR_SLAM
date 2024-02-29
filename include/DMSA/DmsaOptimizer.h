@@ -6,6 +6,9 @@
  * this file. If not, please write to: davidskuddis@web.de, or visit: https://opensource.org/license/mit/
  */
 
+#ifndef DMSAOPTIMIZER_H
+#define DMSAOPTIMIZER_H
+
 #include <vector>
 #include <eigen3/Eigen/Dense>
 #include <limits>
@@ -14,9 +17,6 @@
 #include <eigen3/Eigen/Eigenvalues>
 #include "Gaussians.h"
 #include "OptimizablePointSet.h"
-
-#ifndef DMSAOPTIMIZER_H
-#define DMSAOPTIMIZER_H
 
 using namespace std;
 using namespace Eigen;

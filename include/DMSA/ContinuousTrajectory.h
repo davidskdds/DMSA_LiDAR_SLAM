@@ -6,18 +6,17 @@
  * this file. If not, please write to: davidskuddis@web.de, or visit: https://opensource.org/license/mit/
  */
 
+#ifndef CONTINUOUSTRAJECTORY_H
+#define CONTINUOUSTRAJECTORY_H
+
 #include "OptimizablePointSet.h"
 #include "ConsecutivePoses.h"
-
 #include <vector>
 #include "PointCloudBuffer.h"
 #include "ImuBuffer.h"
 #include "ImuPreintegration.h"
 #include <boost/math/interpolators/barycentric_rational.hpp>
 #include <boost/math/interpolators/cubic_b_spline.hpp>
-
-#ifndef CONTINUOUSTRAJECTORY_H
-#define CONTINUOUSTRAJECTORY_H
 
 using namespace Eigen;
 using namespace std;

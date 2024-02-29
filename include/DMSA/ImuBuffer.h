@@ -6,10 +6,10 @@
  * this file. If not, please write to: davidskuddis@web.de, or visit: https://opensource.org/license/mit/
  */
 
-#include <eigen3/Eigen/Core>
-
 #ifndef POINTCLOUD_H
 #define POINTCLOUD_H
+
+#include <eigen3/Eigen/Core>
 
 struct ImuBuffer
 {

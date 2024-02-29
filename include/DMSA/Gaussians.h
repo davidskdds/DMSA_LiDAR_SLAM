@@ -6,12 +6,12 @@
  * this file. If not, please write to: davidskuddis@web.de, or visit: https://opensource.org/license/mit/
  */
 
+#ifndef GAUSSIANS_H
+#define GAUSSIANS_H
+
 #include <vector>
 #include <eigen3/Eigen/Dense>
 #include <eigen3/Eigen/Core>
-
-#ifndef GAUSSIANS_H
-#define GAUSSIANS_H
 
 using namespace Eigen;
 

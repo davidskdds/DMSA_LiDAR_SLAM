@@ -6,10 +6,10 @@
  * this file. If not, please write to: davidskuddis@web.de, or visit: https://opensource.org/license/mit/
  */
 
-#include <eigen3/Eigen/Core>
-
 #ifndef POSES_H
 #define POSES_H
+
+#include <eigen3/Eigen/Core>
 
 using namespace Eigen;
 

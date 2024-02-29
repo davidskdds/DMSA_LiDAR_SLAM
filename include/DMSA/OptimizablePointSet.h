@@ -6,12 +6,12 @@
  * this file. If not, please write to: davidskuddis@web.de, or visit: https://opensource.org/license/mit/
  */
 
+#ifndef OPTIMIZABLEPOINTSET_H
+#define OPTIMIZABLEPOINTSET_H
+
 #include <eigen3/Eigen/Core>
 #include "PointCloudPlus.h"
 #include <iostream>
-
-#ifndef OPTIMIZABLEPOINTSET_H
-#define OPTIMIZABLEPOINTSET_H
 
 using namespace pcl;
 

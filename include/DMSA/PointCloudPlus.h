@@ -6,11 +6,11 @@
  * this file. If not, please write to: davidskuddis@web.de, or visit: https://opensource.org/license/mit/
  */
 
-#include "PointStampId.h"
-#include <boost/shared_ptr.hpp>
-
 #ifndef POINTCLOUDPLUS_H
 #define POINTCLOUDPLUS_H
+
+#include "PointStampId.h"
+#include <boost/shared_ptr.hpp>
 
 class PointCloudPlus : public pcl::PointCloud<PointStampId>
 {

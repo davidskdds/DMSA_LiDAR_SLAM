@@ -6,14 +6,14 @@
  * this file. If not, please write to: davidskuddis@web.de, or visit: https://opensource.org/license/mit/
  */
 
+#ifndef HELPERS_H
+#define HELPERS_H
+
 #include <eigen3/Eigen/Core>
 #include <eigen3/Eigen/Dense>
 #include <iostream>
 #include <unsupported/Eigen/MatrixFunctions>
 #include "PointCloudPlus.h"
-
-#ifndef HELPERS_H
-#define HELPERS_H
 
 #define EPSILON_ROT 0.00001
 

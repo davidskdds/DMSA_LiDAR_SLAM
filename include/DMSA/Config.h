@@ -6,11 +6,11 @@
  * this file. If not, please write to: davidskuddis@web.de, or visit: https://opensource.org/license/mit/
  */
 
-#include <string>
-#include <eigen3/Eigen/Core>
-
 #ifndef CONFIG_H
 #define CONFIG_H
+
+#include <string>
+#include <eigen3/Eigen/Core>
 
 using namespace Eigen;
 

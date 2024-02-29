@@ -6,14 +6,14 @@
  * this file. If not, please write to: davidskuddis@web.de, or visit: https://opensource.org/license/mit/
  */
 
+#ifndef POINTCLOUDBUFFER_H
+#define POINTCLOUDBUFFER_H
+
 #include "PointCloudPlus.h"
 #include <vector>
 #include <limits>
 #include <iostream>
 #include "RingBuffer.h"
-
-#ifndef POINTCLOUDBUFFER_H
-#define POINTCLOUDBUFFER_H
 
 using namespace pcl;
 using namespace std;

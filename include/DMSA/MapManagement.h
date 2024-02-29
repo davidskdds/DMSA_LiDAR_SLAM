@@ -6,14 +6,13 @@
  * this file. If not, please write to: davidskuddis@web.de, or visit: https://opensource.org/license/mit/
  */
 
+#ifndef MAPMANAGEMENT_H
+#define MAPMANAGEMENT_H
+
 #include <eigen3/Eigen/Core>
 #include "OptimizablePointSet.h"
 #include "ConsecutivePoses.h"
 #include "KeyframeData.h"
-
-
-#ifndef MAPMANAGEMENT_H
-#define MAPMANAGEMENT_H
 
 using namespace pcl;
 using namespace Eigen;

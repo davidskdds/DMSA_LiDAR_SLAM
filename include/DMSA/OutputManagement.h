@@ -6,12 +6,12 @@
  * this file. If not, please write to: davidskuddis@web.de, or visit: https://opensource.org/license/mit/
  */
 
+#ifndef OUTPUTMANAGEMENT_H
+#define OUTPUTMANAGEMENT_H
+
 #include <eigen3/Eigen/Core>
 #include "ConsecutivePoses.h"
 #include "helpers.h"
-
-#ifndef OUTPUTMANAGEMENT_H
-#define OUTPUTMANAGEMENT_H
 
 using namespace Eigen;
 using namespace std;
