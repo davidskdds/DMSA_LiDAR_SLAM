@@ -5,14 +5,14 @@ For point cloud alignment, **Dense Multi Scan Adjustment** (DMSA) is used.
 **The use of IMU data is not mandatory, but recommended.**
 
 <figure>
-<img src="./doc/basement_bv.png" alt="drawing" width="700"/>
+<img src="./doc/basement_bv.png" alt="drawing" width="600"/>
 <figcaption>Fig.1 - Resulting keyframe point cloud of sequence exp14 Basement of the Hilti-Oxford Dataset. The estimated trajectory is marked with a red line.</figcaption>
 </figure>
 
 
 <figure>
 <p align='left'>
-    <img src="./doc/stairs.gif" alt="drawing" width="700"/>
+    <img src="./doc/stairs.gif" alt="drawing" width="600"/>
 </p>
 <figcaption>Fig.2 - Running DMSA SLAM on the stairs sequence of the Newer College Dataset.</figcaption>
 </figure>
@@ -117,6 +117,6 @@ For using an IMU the `imu_topic` and the extrinsics must be specified (see .yaml
 After the package is started, RViz opens and displays the progress of the processing. In RViz the current pose (white), the processed submap point clouds, map points (grey) and the trajectory (red) are shown.
 
 <figure>
-<img src="./doc/rviz_live.png" alt="drawing" width="700"/>
+<img src="./doc/rviz_live.png" alt="drawing" width="600"/>
 <figcaption>Fig.3 - DMSA-SLAM in RViz.</figcaption>
 </figure>

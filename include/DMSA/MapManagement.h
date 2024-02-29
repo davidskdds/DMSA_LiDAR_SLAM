@@ -320,6 +320,9 @@ public:
             keyframeData.relativeOrientMat = axang2rotm(keyframeData.relativeOrient);
         }
 
+        // set padding variable to 1
+        for (auto & point : keyframeData.pointCloudLocal->points) point.data[3] = 1.0f;
+
         // add keyframe data to ringbuffer
         keyframeDataBuffer.addElem(keyframeData);
 

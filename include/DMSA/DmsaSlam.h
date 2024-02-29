@@ -613,6 +613,9 @@ private:
         // transform to imu frame
         pcl::transformPointCloud(*filteredPc, *filteredPc, config.lidarToImuTform);
 
+        // set padding variable to 1
+        for (auto & point : filteredPc->points) point.data[3] = 1.0f;
+
         if (pcBuffer->getNumUpdates() % 10 == 0)
             std::cerr << "Grid size preprocessing: " << filteredPc->gridSize << " / num points: " << filteredPc->size() << "\n";
     }
