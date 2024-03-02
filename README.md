@@ -1,6 +1,6 @@
 # DMSA-SLAM
 DMSA LiDAR SLAM is a robust and accurate package for LiDAR and IMU based mapping. First point clouds within a sliding time window are optimized conjointly with so called static points from the map and IMU measurements. When a new keyframe is added to the map, related keyframes are optimized. Keyframes are stored in a ring buffer, therefore old keyframes are deleted from a certain map size.
-For point cloud alignment, **Dense Multi Scan Adjustment** (DMSA) is used.
+For point cloud alignment, **Dense Multi Scan Adjustment** (DMSA) is used. Details can be found in our [paper](https://arxiv.org/abs/2402.19044) (preprint, accepted for ICRA 2024).
 
 **The use of IMU data is not mandatory, but recommended.**
 
@@ -33,7 +33,7 @@ For point cloud alignment, **Dense Multi Scan Adjustment** (DMSA) is used.
 ## Preface
 The package is primarily designed as an offline mapping module and the default parameters are optimized towards robustness and accuracy. The processing speed is highly dependent on the hardware used and the data acquisition environment. Typical processing times are 2-3 times the recording time.
 
-**Note:** In order to publish the software under the MIT license, a different type of interpolation was used to calculate the dense trajectory poses, in contrast to the published paper. While [Cubic Hermitian spline interpolation](https://github.com/ttk592/spline) was used for the results published in the paper, in the published software [Barycentric Rational interpolation](https://live.boost.org/doc/libs/1_72_0/libs/math/doc/html/math_toolkit/barycentric.html) is used. This change and the continuous development of the software may lead to minor deviations in accuracy compared to the published results.
+**Note:** In order to publish the software under the MIT license, a different type of interpolation was used to calculate the dense trajectory poses, in contrast to the published [paper](https://arxiv.org/abs/2402.19044). While [Cubic Hermitian spline interpolation](https://github.com/ttk592/spline) was used for the results published in the paper, in the published software [Barycentric Rational interpolation](https://live.boost.org/doc/libs/1_72_0/libs/math/doc/html/math_toolkit/barycentric.html) is used. This change and the continuous development of the software may lead to minor deviations in accuracy compared to the published results.
 
 **Input:** Rosbag with LiDAR (PointCloud2-Messages) and IMU data
 
@@ -113,6 +113,10 @@ For using an IMU the `imu_topic` and the extrinsics must be specified (see .yaml
 
 ### 2. Run Package:
 `roslaunch dmsa_slam_ros hilti_2022.launch`
+
+or
+
+`roslaunch dmsa_slam_ros custom.launch`
 
 After the package is started, RViz opens and displays the progress of the processing. In RViz the current pose (white), the processed submap point clouds, map points (grey) and the trajectory (red) are shown.
 
