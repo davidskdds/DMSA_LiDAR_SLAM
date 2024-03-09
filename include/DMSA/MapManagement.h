@@ -34,7 +34,7 @@ public:
     int maxNumKeyframes;
 
     // new origin for centralization
-    Vector3d newOrigin;
+    Vector3d origin;
 
     bool useGravityErrorTerms = false;
     bool useOdometryErrorTerms = false;
@@ -73,7 +73,7 @@ public:
     void centralize()
     {
         return;
-        newOrigin = keyframePoses.relativePoses.Translations.col(0);
+        origin = keyframePoses.relativePoses.Translations.col(0);
         keyframePoses.relativePoses.Translations.col(0).setZero();
         keyframePoses.relative2global();
     }
@@ -81,7 +81,7 @@ public:
     {
         return;
         keyframePoses.global2relative();
-        keyframePoses.relativePoses.Translations.col(0) = newOrigin;
+        keyframePoses.relativePoses.Translations.col(0) = origin;
         keyframePoses.relative2global();
     }
 
@@ -187,6 +187,8 @@ public:
 
         for (int k = 1; k < keyframeDataBuffer.getNumElements(); ++k)
         {
+            if (keyframeDataBuffer.at(k).gravityPlausible == false ) continue;
+
             // calculate gravity error
             diffVec = axang2rotm(keyframePoses.globalPoses.Orientations.col(k)) * keyframeDataBuffer.at(k).measuredGravity - gravity;
 

@@ -17,7 +17,7 @@ using namespace Eigen;
 struct Config
 {
     int n_clouds = 5;
-    int num_control_points = 6;
+    int num_control_poses = 6;
     std::string sensor = "hesai";
     bool optimize_sliding_window_keyframes = true;
     int last_n_keyframes_for_optim = 10;
@@ -64,6 +64,8 @@ struct Config
 
     bool select_best_set_key = false;
     int min_num_points_gauss_key = 6;
+
+    double gravity_outlier_thresh = 1.0;
 };
 
 #endif

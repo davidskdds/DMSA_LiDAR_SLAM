@@ -24,11 +24,11 @@ using namespace std;
 class ContinuousTrajectory : public OptimizablePointSet<PointStampId>
 {
 public:
-    StampedConsecutivePoses SparsePoses;
+    StampedConsecutivePoses controlPoses;
 
-    Poses DenseGlobalPoses;
+    Poses denseGlobalPoses;
 
-    vector<Matrix4f> DenseTformsLocal2Global;
+    vector<Matrix4f> denseTformsLocal2Global;
 
     VectorXd trajTime;
     Vector3d gravity;
@@ -55,17 +55,17 @@ public:
     int numParams;
     int n_total;
 
-    // translation buffer for centralization
-    Vector3d newOrigin;
+    // origin is saved here in case of centralization
+    Vector3d origin;
 
-    // imu
+    // imu measurement containers
     Matrix3Xd accMeas;
     Matrix3Xd angVelMeas;
 
     VectorXd imuFactorError;
-
     VectorXi paramIndices;
 
+    // registered point cloud buffer
     std::shared_ptr<PointCloudBuffer> regPcBuffer;
 
     vector<vector<int>> tformIdPerPoint;
@@ -74,28 +74,28 @@ public:
 
     void centralize()
     {
-        newOrigin = SparsePoses.relativePoses.Translations.col(0);
+        origin = controlPoses.relativePoses.Translations.col(0);
 
-        SparsePoses.relativePoses.Translations.col(0).setZero();
+        controlPoses.relativePoses.Translations.col(0).setZero();
 
-        SparsePoses.relative2global();
+        controlPoses.relative2global();
 
         for (auto &point : globalPoints)
         {
             if (point.isStatic > 0)
-                point.getVector3fMap() = point.getVector3fMap() - newOrigin.cast<float>();
+                point.getVector3fMap() = point.getVector3fMap() - origin.cast<float>();
         }
     }
     void decentralize()
     {
-        SparsePoses.global2relative();
-        SparsePoses.relativePoses.Translations.col(0) = newOrigin;
-        SparsePoses.relative2global();
+        controlPoses.global2relative();
+        controlPoses.relativePoses.Translations.col(0) = origin;
+        controlPoses.relative2global();
 
         for (auto &point : globalPoints)
         {
             if (point.isStatic > 0)
-                point.getVector3fMap() = point.getVector3fMap() + newOrigin.cast<float>();
+                point.getVector3fMap() = point.getVector3fMap() + origin.cast<float>();
         }
     }
 
@@ -118,12 +118,12 @@ public:
 
     void getPoseParameters(VectorXd &params)
     {
-        SparsePoses.relativePoses.getParamsAsVector(params);
+        controlPoses.relativePoses.getParamsAsVector(params);
     }
 
     void setPoseParameters(const Eigen::VectorXd &params)
     {
-        SparsePoses.relativePoses.setParamsFromVector(params);
+        controlPoses.relativePoses.setParamsFromVector(params);
     }
 
     void updateGlobalPoints()
@@ -148,7 +148,7 @@ public:
 
                 Eigen::Map<Vector4f> targetMap(pointTargetRef.data);
 
-                targetMap = DenseTformsLocal2Global[currTformId] * pointOriginRef.getVector4fMap();
+                targetMap = denseTformsLocal2Global[currTformId] * pointOriginRef.getVector4fMap();
 
                 ++currId;
             }
@@ -188,13 +188,13 @@ public:
 
     void updateTrajDenseTforms()
     {
-        SparsePoses.relative2global();
+        controlPoses.relative2global();
 
         // interpolate orientations with slerp
         for (int k = 0; k < n_total; ++k)
         {
             // rotational interpolation
-            getInterpRotation(SparsePoses.globalPoses, SparsePoses.stamps, trajTime(k), DenseGlobalPoses.Orientations.col(k));
+            getInterpRotation(controlPoses.globalPoses, controlPoses.stamps, trajTime(k), denseGlobalPoses.Orientations.col(k));
         }
 
         // interpolation of translation
@@ -202,26 +202,26 @@ public:
         {
 
             // Map translations to std vec
-            Eigen::VectorXd translations = SparsePoses.globalPoses.Translations.row(k);
-            Map<VectorXd> TranslationsMap(translations.data(), translations.size());
-            std::vector<double> vec_translations(TranslationsMap.data(), TranslationsMap.data() + TranslationsMap.size());
+            Eigen::VectorXd translations = controlPoses.globalPoses.Translations.row(k);
+            Map<VectorXd> translationsMap(translations.data(), translations.size());
+            std::vector<double> vec_translations(translationsMap.data(), translationsMap.data() + translationsMap.size());
 
             // Map XYZ to std vec
-            Map<VectorXd> paramStampsMap(SparsePoses.stamps.data(), SparsePoses.stamps.size());
+            Map<VectorXd> paramStampsMap(controlPoses.stamps.data(), controlPoses.stamps.size());
             std::vector<double> vec_paramStamps(paramStampsMap.data(), paramStampsMap.data() + paramStampsMap.size());
 
             // interpolation
             boost::math::barycentric_rational<double> s(vec_paramStamps.data(), vec_translations.data(), vec_paramStamps.size(), 2);
 
             for (int j = 0; j < n_total; ++j)
-                DenseGlobalPoses.Translations(k, j) = (double)s(trajTime(j));
+                denseGlobalPoses.Translations(k, j) = (double)s(trajTime(j));
         }
 
         // update dense transforms
         for (int k = 0; k < n_total; ++k)
         {
-            DenseTformsLocal2Global[k].block(0, 0, 3, 3) = axang2rotm(DenseGlobalPoses.Orientations.col(k)).cast<float>();
-            DenseTformsLocal2Global[k].block(0, 3, 3, 1) = DenseGlobalPoses.Translations.col(k).cast<float>();
+            denseTformsLocal2Global[k].block(0, 0, 3, 3) = axang2rotm(denseGlobalPoses.Orientations.col(k)).cast<float>();
+            denseTformsLocal2Global[k].block(0, 3, 3, 1) = denseGlobalPoses.Translations.col(k).cast<float>();
         }
     }
 
@@ -290,15 +290,15 @@ public:
 
         Vector3d normedAxisAngle = angleAxis.angle() * angleAxis.axis();
 
-        SparsePoses.relativePoses.Orientations.col(0) = normedAxisAngle;
+        controlPoses.relativePoses.Orientations.col(0) = normedAxisAngle;
 
         // update global params
-        SparsePoses.relative2global();
+        controlPoses.relative2global();
 
         cout << "Estimated gravity direction: " << normedAxisAngle.transpose() << endl;
     }
 
-    void initTraj(double t_min, double t_max, int numControlPoints, bool useImu, double dtResIn)
+    void initTraj(double t_min, double t_max, int numControlPoses, bool useImu, double dtResIn)
     {
 
         // init
@@ -310,30 +310,30 @@ public:
         n_total = round(horizon / dt_res) + 1;
 
         // init data structures
-        DenseTformsLocal2Global.resize(n_total);
+        denseTformsLocal2Global.resize(n_total);
 
         for (int k = 0; k < n_total; ++k)
-            DenseTformsLocal2Global[k] = Matrix4f::Identity();
+            denseTformsLocal2Global[k] = Matrix4f::Identity();
 
         accMeas.conservativeResize(3, n_total);
         angVelMeas.conservativeResize(3, n_total);
 
-        DenseGlobalPoses.resize(n_total);
+        denseGlobalPoses.resize(n_total);
 
         trajTime = VectorXd::LinSpaced(n_total, 0.0, horizon);
 
         // calc total number of parameters
-        numParams = numControlPoints;
+        numParams = numControlPoses;
 
         // set number of parameters
-        SparsePoses = StampedConsecutivePoses(numParams);
+        controlPoses = StampedConsecutivePoses(numParams);
 
         // init stamps of sparse poses
-        SparsePoses.stamps = VectorXd::LinSpaced(numParams, 0.0, horizon);
+        controlPoses.stamps = VectorXd::LinSpaced(numParams, 0.0, horizon);
 
         // init param indices
         paramIndices.resize(numParams);
-        paramIndices = (SparsePoses.stamps / dt_res).array().round().matrix().cast<int>();
+        paramIndices = (controlPoses.stamps / dt_res).array().round().matrix().cast<int>();
 
         preintImuRots.resize(numParams);
         preintRelPositions.resize(numParams);
@@ -380,18 +380,18 @@ public:
         }
 
         // update global parameter set
-        oldTraj.SparsePoses.relative2global();
+        oldTraj.controlPoses.relative2global();
 
-        for (int k = 0; k < SparsePoses.stamps.size(); ++k)
+        for (int k = 0; k < controlPoses.stamps.size(); ++k)
         {
-            if (t0 + SparsePoses.stamps(k) < oldTraj.t0 + oldTraj.horizon)
+            if (t0 + controlPoses.stamps(k) < oldTraj.t0 + oldTraj.horizon)
                 lastKnownParamId = k;
         }
 
         // get orientation for control poses from old trajectory by interpolation
         for (int k = 0; k <= lastKnownParamId; ++k)
         {
-            getInterpRotation(oldTraj.SparsePoses.globalPoses, oldTraj.SparsePoses.stamps, SparsePoses.stamps(k) + t0 - oldTraj.t0, SparsePoses.globalPoses.Orientations.col(k));
+            getInterpRotation(oldTraj.controlPoses.globalPoses, oldTraj.controlPoses.stamps, controlPoses.stamps(k) + t0 - oldTraj.t0, controlPoses.globalPoses.Orientations.col(k));
         }
 
         // get position of control poses from old trajectory by cubic interpolation
@@ -401,32 +401,32 @@ public:
         {
 
             // Map translations to std vec
-            VectorXd translations = oldTraj.SparsePoses.globalPoses.Translations.row(k);
-            Map<VectorXd> TranslationsMap(translations.data(), translations.size());
-            vector<double> vec_translations(TranslationsMap.data(), TranslationsMap.data() + TranslationsMap.size());
+            VectorXd translations = oldTraj.controlPoses.globalPoses.Translations.row(k);
+            Map<VectorXd> translationsMap(translations.data(), translations.size());
+            vector<double> vec_translations(translationsMap.data(), translationsMap.data() + translationsMap.size());
 
             // Map XYZ to std vec
-            Map<VectorXd> paramStampsMap(oldTraj.SparsePoses.stamps.data(), oldTraj.SparsePoses.stamps.size());
+            Map<VectorXd> paramStampsMap(oldTraj.controlPoses.stamps.data(), oldTraj.controlPoses.stamps.size());
             vector<double> vec_paramStamps(paramStampsMap.data(), paramStampsMap.data() + paramStampsMap.size());
 
             // spline interpolation
             boost::math::barycentric_rational<double> s(vec_paramStamps.data(), vec_translations.data(), vec_paramStamps.size(), 2);
 
             for (int j = 0; j <= lastKnownParamId; ++j)
-                SparsePoses.globalPoses.Translations(k, j) = (double)s(SparsePoses.stamps(j) + t0 - oldTraj.t0);
+                controlPoses.globalPoses.Translations(k, j) = (double)s(controlPoses.stamps(j) + t0 - oldTraj.t0);
 
             // numeric differentation for velocity
-            v0(k) = s.prime(SparsePoses.stamps(lastKnownParamId) + t0 - oldTraj.t0);
+            v0(k) = s.prime(controlPoses.stamps(lastKnownParamId) + t0 - oldTraj.t0);
         }
 
         // update relative parameter set
-        SparsePoses.global2relative();
+        controlPoses.global2relative();
 
         if (useImu)
         {
 
-            Vector3d pos0 = SparsePoses.globalPoses.Translations.col(lastKnownParamId);
-            Vector3d axang0 = SparsePoses.globalPoses.Orientations.col(lastKnownParamId);
+            Vector3d pos0 = controlPoses.globalPoses.Translations.col(lastKnownParamId);
+            Vector3d axang0 = controlPoses.globalPoses.Orientations.col(lastKnownParamId);
             double t0, tend;
 
             Vector3d axang_end, pos_end, v_end;
@@ -435,16 +435,16 @@ public:
 
             for (int k = lastKnownParamId; k < numParams - 1; ++k)
             {
-                t0 = SparsePoses.stamps(k);
+                t0 = controlPoses.stamps(k);
 
-                tend = SparsePoses.stamps(k + 1);
+                tend = controlPoses.stamps(k + 1);
 
                 // integrate parameters
                 getImuIntegratedParams(t0, axang0, pos0, v0, tend, axang_end, pos_end, v_end);
 
                 // save parameters
-                SparsePoses.globalPoses.Orientations.col(k + 1) = axang_end;
-                SparsePoses.globalPoses.Translations.col(k + 1) = pos_end;
+                controlPoses.globalPoses.Orientations.col(k + 1) = axang_end;
+                controlPoses.globalPoses.Translations.col(k + 1) = pos_end;
 
                 axang0 = axang_end;
                 pos0 = pos_end;
@@ -452,19 +452,19 @@ public:
             }
 
             // update relative parameter set
-            SparsePoses.global2relative();
+            controlPoses.global2relative();
         }
         else
         {
             // predict const vel / angular vel
             for (int k = lastKnownParamId; k < numParams - 1; ++k)
             {
-                SparsePoses.relativePoses.Orientations.col(k + 1) = SparsePoses.relativePoses.Orientations.col(lastKnownParamId);
-                SparsePoses.relativePoses.Translations.col(k + 1) = SparsePoses.relativePoses.Translations.col(lastKnownParamId);
+                controlPoses.relativePoses.Orientations.col(k + 1) = controlPoses.relativePoses.Orientations.col(lastKnownParamId);
+                controlPoses.relativePoses.Translations.col(k + 1) = controlPoses.relativePoses.Translations.col(lastKnownParamId);
             }
 
             // update relative parameters
-            SparsePoses.relative2global();
+            controlPoses.relative2global();
         }
     }
 
@@ -529,7 +529,7 @@ public:
 
         Matrix<double, 9, 9> covMat;
 
-        for (int k = 1; k < SparsePoses.numPoses; ++k)
+        for (int k = 1; k < controlPoses.numPoses; ++k)
         {
             fromId = paramIndices(k - 1);
             toId = paramIndices(k);
@@ -594,16 +594,16 @@ public:
     {
         // sum up preint positions
         double one_div_t_res = 1.0 / dt_res;
-        Vector3d v_start_w = one_div_t_res * (DenseGlobalPoses.Translations.col(1) - DenseGlobalPoses.Translations.col(0));
-        Matrix3d R_imu2w_start = axang2rotm(SparsePoses.globalPoses.getFirstOrientation());
+        Vector3d v_start_w = one_div_t_res * (denseGlobalPoses.Translations.col(1) - denseGlobalPoses.Translations.col(0));
+        Matrix3d R_imu2w_start = axang2rotm(controlPoses.globalPoses.getFirstOrientation());
 
-        gravity_imu = (R_imu2w_start.transpose() * (SparsePoses.globalPoses.getLastTranslation() - SparsePoses.globalPoses.getFirstTranslation() - v_start_w * horizon) - preintPosComplHor) / (0.5 * pow(horizon, 2));
+        gravity_imu = (R_imu2w_start.transpose() * (controlPoses.globalPoses.getLastTranslation() - controlPoses.globalPoses.getFirstTranslation() - v_start_w * horizon) - preintPosComplHor) / (0.5 * pow(horizon, 2));
     }
 
     void updateImuError()
     {
         /* preint ACCELERATION POS ERROR */
-        SparsePoses.global2relative();
+        controlPoses.global2relative();
 
         // reset
         imuFactorError.setZero();
@@ -626,23 +626,23 @@ public:
         {
 
             // calculate position error
-            R_imu2w_start = axang2rotm(SparsePoses.globalPoses.Orientations.col(k - 1));
+            R_imu2w_start = axang2rotm(controlPoses.globalPoses.Orientations.col(k - 1));
 
-            delta_t = SparsePoses.stamps(k) - SparsePoses.stamps(k - 1);
+            delta_t = controlPoses.stamps(k) - controlPoses.stamps(k - 1);
 
             // calc start velocity
-            v_start_w = one_div_t_res * (DenseGlobalPoses.Translations.col(paramIndices(k - 1) + 1) - DenseGlobalPoses.Translations.col(paramIndices(k - 1)));
+            v_start_w = one_div_t_res * (denseGlobalPoses.Translations.col(paramIndices(k - 1) + 1) - denseGlobalPoses.Translations.col(paramIndices(k - 1)));
 
             // calc end velocity
-            v_end_world = one_div_t_res * (DenseGlobalPoses.Translations.col(paramIndices(k)) - DenseGlobalPoses.Translations.col(paramIndices(k) - 1));
+            v_end_world = one_div_t_res * (denseGlobalPoses.Translations.col(paramIndices(k)) - denseGlobalPoses.Translations.col(paramIndices(k) - 1));
 
-            delta_p_model = R_imu2w_start.transpose() * (SparsePoses.globalPoses.Translations.col(k) - SparsePoses.globalPoses.Translations.col(k - 1) - v_start_w * delta_t - 0.5 * pow(delta_t, 2) * gravity);
+            delta_p_model = R_imu2w_start.transpose() * (controlPoses.globalPoses.Translations.col(k) - controlPoses.globalPoses.Translations.col(k - 1) - v_start_w * delta_t - 0.5 * pow(delta_t, 2) * gravity);
 
             // + R_imu2w_start*
             pos_error = delta_p_model - preintRelPositions[k];
 
             // calculate rotation error
-            R_imu2w_end = axang2rotm(SparsePoses.relativePoses.Orientations.col(k));
+            R_imu2w_end = axang2rotm(controlPoses.relativePoses.Orientations.col(k));
             R_tmp = preintImuRots[k].transpose() * R_imu2w_end;
 
             rot_error = rotm2axang(R_tmp);

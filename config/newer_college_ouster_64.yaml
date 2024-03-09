@@ -1,10 +1,9 @@
 
-
 bag_dirs: "/media/david/PortableSSD/data/Rosbags/NewerCollege/2021-07-01-10-40-50_0-stairs.bag"
-#bag_dirs: "/media/david/PortableSSD/data/Rosbags/NewerCollege/2021-12-02-10-15-59_0-cloister.bag /media/david/PortableSSD/data/Rosbags/NewerCollege/2021-12-02-10-19-05_1-cloister.bag"
 
-lidar_topic: "/os_cloud_node/points"
-imu_topic: "/os_cloud_node/imu"
+# input
+lidar_topic: "/os1_cloud_node/points"
+imu_topic: "/os1_cloud_node/imu"
 
 # output: save resulting poses and point cloud
 # pose format: [timestamp_s tx ty tz qx qy qz qw]
@@ -21,8 +20,8 @@ timeshift_lidar2imu: 0.000
 
 ## imu setting ##
 use_imu: true
-sigma_gyr: 0.01
-sigma_acc: 0.3
+sigma_gyr: 0.003
+sigma_acc: 0.1
 
 # extrinsic imu2lidar #
 # rot quaternion
@@ -35,3 +34,4 @@ q_w: 1.000
 t_x: 0.0
 t_y: 0.0
 t_z: 0.0
+

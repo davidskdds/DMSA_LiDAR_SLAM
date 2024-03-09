@@ -6,7 +6,7 @@
 
   <node name="dmsa_slam_ros" pkg="dmsa_slam_ros" type="dmsa_slam_ros" output="screen">
   <rosparam command="load" file="$(find dmsa_slam_ros)/config/slam_settings.yaml" />
-  <rosparam command="load" file="$(find dmsa_slam_ros)/config/Ouster_LiDAR_NewerCollege_128.yaml" />
+  <rosparam command="load" file="$(find dmsa_slam_ros)/config/newer_college_ouster_128.yaml" />
   </node>
   
   <node pkg="rviz" type="rviz" name="rviz" args="-d $(find dmsa_slam_ros)/rviz/dmsa.rviz" />

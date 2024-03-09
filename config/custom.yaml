@@ -20,8 +20,8 @@ use_imu: true
 imu_topic: "/ouster/imu"
 
 # IMU sensor noise (does not need to be adjusted in most cases)
-sigma_gyr: 0.03
-sigma_acc: 0.4
+sigma_gyr: 0.003
+sigma_acc: 0.1
 
 # clock time shift (does not need to be adjusted in most cases)
 timeshift_lidar2imu: 0.000

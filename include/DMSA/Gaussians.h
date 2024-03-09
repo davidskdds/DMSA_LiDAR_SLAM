@@ -27,62 +27,61 @@ inline bool splitSet(const PointCloudType &cloud, std::vector<int> &IdsSet, std:
 template <>
 inline bool splitSet(const pcl::PointCloud<pcl::PointNormal> &cloud, std::vector<int> &IdsSet, std::vector<int> &IdsSet2, int &minNumPts)
 {
+    // find two normal vectors that are maximum opposite
+    float minDiffFromZero = std::numeric_limits<float>::max();
 
-    Eigen::Vector3f meanSet1, meanSet2;
-    int numSet1, numSet2;
-    std::vector<int> newIdsSet1, newIdsSet2;
+    float currDiff;
+    std::vector<int> minDiffSet(2);
 
-    newIdsSet1.resize(IdsSet.size());
-    newIdsSet2.resize(IdsSet.size());
-
-    // split normal vectors with xy-plane, xz-plane and yz-plane and analyse distance between the two custers to split double walls
-    for (int dim = 0; dim < 3; ++dim)
+    for (auto & id1 : IdsSet)
     {
-        // reset
-        numSet1 = 0;
-        numSet2 = 0;
-
-        meanSet1 << 0.0, 0.0, 0.0;
-        meanSet2 << 0.0, 0.0, 0.0;
-
-        for (int k = 0; k < IdsSet.size(); ++k)
+        for (auto & id2 : IdsSet)
         {
+            if (id1 == id2) continue;
 
-            if (cloud.points[IdsSet[k]].getNormalVector3fMap()(dim) > 0.0)
+            currDiff = (cloud.points[id1].getNormalVector3fMap() + cloud.points[id2].getNormalVector3fMap()).norm();
+
+            if (currDiff < minDiffFromZero)
             {
-                meanSet1 += cloud.points[IdsSet[k]].getNormalVector3fMap();
-                newIdsSet1[numSet1] = IdsSet[k];
-                ++numSet1;
+                minDiffFromZero = currDiff;
+                minDiffSet[0] = id1;
+                minDiffSet[1] = id2;
             }
-            else
-            {
-                meanSet2 += cloud.points[IdsSet[k]].getNormalVector3fMap();
-                newIdsSet2[numSet2] = IdsSet[k];
-                ++numSet2;
-            }
-        }
-
-        if (numSet1 < minNumPts / 2 || numSet2 < minNumPts / 2)
-            continue;
-
-        // mean
-        meanSet1 *= 1.0 / (float)numSet1;
-        meanSet2 *= 1.0 / (float)numSet2;
-
-        // analyse clusters
-        if ((meanSet1 - meanSet2).norm() > 1.3)
-        {
-            newIdsSet1.resize(numSet1);
-            newIdsSet2.resize(numSet2);
-
-            IdsSet = newIdsSet1;
-            IdsSet2 = newIdsSet2;
-            // std::cout << "Splitted set dim: "<<dim<<" cluster1: "<<meanSet1.transpose()<<" cluster2: "<<meanSet2.transpose()<<std::endl;
-            return true;
         }
     }
 
-    return false;
+    // if there are no opposite vectors, stop here
+    if (minDiffFromZero > 0.5f) return false;
+
+    // create splitting plane
+    int & id1 = minDiffSet[0];
+    int & id2 = minDiffSet[1];
+
+    Vector3f refNormalVec = cloud.points[id1].getNormalVector3fMap();
+    Vector3f refNormalVec2 = cloud.points[id2].getNormalVector3fMap();
+
+    // create new id vectors
+    std::vector<int> newIdsSet1, newIdsSet2;
+    newIdsSet1.reserve(IdsSet.size());
+    newIdsSet2.reserve(IdsSet.size());
+
+    float diff1, diff2;
+
+    for (auto & id : IdsSet)
+    {
+        diff1 = (refNormalVec-cloud.points[id].getNormalVector3fMap()).norm();
+        diff2 = (refNormalVec2-cloud.points[id].getNormalVector3fMap()).norm();
+
+        if (diff1< diff2) newIdsSet1.push_back(id);
+        else newIdsSet2.push_back(id);
+
+    }
+
+    IdsSet = newIdsSet1;
+    IdsSet2 = newIdsSet2;
+
+    return true;
+
 }
 
 class Gaussians
@@ -96,9 +95,6 @@ public:
 
 
     float score;
-
-    Matrix3f InformationBalance;
-
     bool limited_cov = false;
 
     int numPointSets = 0;
@@ -157,10 +153,10 @@ public:
         float infoDet = cov.inverse().determinant();
 
         // update score
-        score = score + std::log(1.0f + infoDet); //*std::pow(static_cast<float>(ids.size()),2);
+        score = score + std::log(1.0f + infoDet);
 
         // limit covariance
-        limit_cov(cov);
+        limitCovariance(cov);
 
         // save information matrix
         infoMats[numPointSets] = cov.inverse();
@@ -190,26 +186,26 @@ public:
         // rebalancingWeights.setConstant(1.0);
     }
 
-    void limit_cov(Matrix3f &io_cov)
+    void limitCovariance(Matrix3f &io_cov)
     {
 
         EigenSolver<Matrix3f> eigensolver;
         eigensolver.compute(io_cov);
 
-        Vector3f eigen_values = eigensolver.eigenvalues().real();
-        Matrix3f eigen_vectors = eigensolver.eigenvectors().real();
+        Vector3f eigenValues = eigensolver.eigenvalues().real();
+        Matrix3f eigenVectors = eigensolver.eigenvectors().real();
 
         // modify eigen values
         for (int k = 0; k < 3; ++k)
         {
-            eigen_values(k) = std::max(eigen_values(k), 0.0001f);
+            eigenValues(k) = std::max(eigenValues(k), 0.0001f);
         }
 
         // create diagonal matrix
-        DiagonalMatrix<float, 3> diagonal_matrix(eigen_values(0), eigen_values(1), eigen_values(2));
+        DiagonalMatrix<float, 3> diagonal_matrix(eigenValues(0), eigenValues(1), eigenValues(2));
 
         // update covariance
-        io_cov = eigen_vectors * diagonal_matrix * eigen_vectors.inverse();
+        io_cov = eigenVectors * diagonal_matrix * eigenVectors.inverse();
     }
 };
 

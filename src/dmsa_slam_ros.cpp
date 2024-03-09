@@ -106,8 +106,8 @@ dmsa_slam_ros::dmsa_slam_ros()
     nh.getParam("num_clouds_submap", config.n_clouds);
     std::cout << "num_clouds_submap: " << config.n_clouds << std::endl;
 
-    nh.getParam("numControlPoints", config.num_control_points);
-    std::cout << "numControlPoints: " << config.num_control_points << std::endl;
+    nh.getParam("num_control_poses", config.num_control_poses);
+    std::cout << "num_control_poses: " << config.num_control_poses << std::endl;
 
     nh.getParam("last_n_keyframes_for_optim", config.last_n_keyframes_for_optim);
     std::cout << "last_n_keyframes_for_optim: " << config.last_n_keyframes_for_optim << std::endl;
@@ -147,6 +147,9 @@ dmsa_slam_ros::dmsa_slam_ros()
 
     nh.getParam("dist_static_points_keyframe", config.dist_static_points_keyframe);
     std::cout << "dist_static_points_keyframe: " << config.dist_static_points_keyframe << std::endl;
+
+    nh.getParam("gravity_outlier_thresh", config.gravity_outlier_thresh);
+    std::cout << "gravity_outlier_thresh: " << config.gravity_outlier_thresh << std::endl;
 
     double sigma_gyr;
 
@@ -198,7 +201,7 @@ dmsa_slam_ros::dmsa_slam_ros()
         config.last_n_keyframes_for_optim = 5;
         config.num_iter_keyframe_optim = 1;
         config.num_iter_sliding_window_optim = 5;
-        config.num_control_points = 10;
+        config.num_control_poses = 10;
         config.use_imu = true;
         config.max_num_points_per_scan = 1000;
         config.minDistDS = 10.0;
@@ -321,9 +324,9 @@ void dmsa_slam_ros::publishPointCloudsAndPose()
     PointCloud<PointXYZ> currPosition;
 
     currPosition.points.resize(1);
-    currPosition.points[0].x = DmsaSLAMObj.currTraj->SparsePoses.globalPoses.Translations(0,0);
-    currPosition.points[0].y = DmsaSLAMObj.currTraj->SparsePoses.globalPoses.Translations(1,0);
-    currPosition.points[0].z = DmsaSLAMObj.currTraj->SparsePoses.globalPoses.Translations(2,0);
+    currPosition.points[0].x = DmsaSLAMObj.currTraj->controlPoses.globalPoses.Translations(0,0);
+    currPosition.points[0].y = DmsaSLAMObj.currTraj->controlPoses.globalPoses.Translations(1,0);
+    currPosition.points[0].z = DmsaSLAMObj.currTraj->controlPoses.globalPoses.Translations(2,0);
 
     pcl::toROSMsg(DmsaSLAMObj.currTraj->globalPoints, submapMsg);
     pcl::toROSMsg(currPosition, trajMsg);
@@ -336,11 +339,11 @@ void dmsa_slam_ros::publishPointCloudsAndPose()
 
     geometry_msgs::PoseStamped currPose;
 
-    currPose.pose.position.x = DmsaSLAMObj.currTraj->SparsePoses.globalPoses.Translations(0,0);
-    currPose.pose.position.y = DmsaSLAMObj.currTraj->SparsePoses.globalPoses.Translations(1,0);
-    currPose.pose.position.z = DmsaSLAMObj.currTraj->SparsePoses.globalPoses.Translations(2,0);
+    currPose.pose.position.x = DmsaSLAMObj.currTraj->controlPoses.globalPoses.Translations(0,0);
+    currPose.pose.position.y = DmsaSLAMObj.currTraj->controlPoses.globalPoses.Translations(1,0);
+    currPose.pose.position.z = DmsaSLAMObj.currTraj->controlPoses.globalPoses.Translations(2,0);
 
-    Matrix3d R = axang2rotm(DmsaSLAMObj.currTraj->SparsePoses.globalPoses.Orientations.col(0));
+    Matrix3d R = axang2rotm(DmsaSLAMObj.currTraj->controlPoses.globalPoses.Orientations.col(0));
     Quaterniond q(R);
 
     currPose.pose.orientation.x = q.x();
