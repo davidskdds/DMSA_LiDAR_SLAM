@@ -62,7 +62,7 @@ Compatibility with other Ubuntu/ROS/Eigen versions should be possible, but has n
 ### 1. Install ROS Noetic
 Instructions for installing ROS Noetic can be found [here](http://wiki.ros.org/noetic/Installation). 
 
-### 2. How to install Eigen 3.4.0
+### 2. Update Eigen to Eigen 3.4.0
 Unfortunately, Eigen 3.4.0 is not available via apt package management on Ubuntu 20.04. You can download the latest Eigen version from [here](https://eigen.tuxfamily.org/index.php?title=Main_Page) and follow the instructions.
 
 You can also use the provided shell script, that will update your Eigen version to 3.4.0 on Ubuntu 20.04:
@@ -107,7 +107,7 @@ The parameter could be set like this:
 `result_dir: "/home/USERNAME"`
 
 
-### 4. LiDAR and IMU Settings (not necessary for benchmark dataset configurations like Hilti and Newer College)
+### 3. LiDAR and IMU Settings (not necessary for benchmark dataset configurations like Hilti and Newer College)
 Regarding the LiDAR the `sensor` type {"hesai","ouster","robosense","velodyne","unknown"} and the `lidar_topic` must be specified in the .yaml file.
 For using an IMU the `imu_topic` and the extrinsics must be specified (see .yaml file). It is also possible to run DMSA-SLAM without IMU data. To do so, set `use_imu: false`.
 
