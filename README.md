@@ -44,6 +44,11 @@ The package can work with LiDAR data from the following manufacturers (the ROS d
 - Hesai
 - Velodyne
 - Robosense
+- (Livox)
+
+**Info for Livox-LiDARs:** The point clouds from Livox-LiDARs are at the moment not directly supported, but can be processed if the point clouds are recorded as PointCloud2-messages using the setting **sensor: "unknown"**. It is also recommended to change the following parameters in `config/slam_settings.yaml` to `min_num_points_gauss: 5` and `min_num_points_gauss_key: 6` to obtain better results with sparse Livox point clouds.
+
+**-> If someone can provide a rosbag (1-2 min, with motion) with Livox point clouds in the PointCloud2 PointXYZRTLT format (see [livox_ros_driver2](https://github.com/Livox-SDK/livox_ros_driver2)), then I will integrate a separate Livox configuration into the software.**
 
 ## Prerequisites
 The package was developed with the following packages:

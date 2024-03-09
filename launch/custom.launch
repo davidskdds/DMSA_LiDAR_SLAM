@@ -8,5 +8,7 @@
   <rosparam command="load" file="$(find dmsa_slam_ros)/config/custom.yaml" />
 </node>
 
+<node pkg="rviz" type="rviz" name="rviz" args="-d $(find dmsa_slam_ros)/rviz/dmsa.rviz" />
+
 
 </launch>
