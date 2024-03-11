@@ -29,6 +29,8 @@ For point cloud alignment, **Dense Multi Scan Adjustment** (DMSA) is used. Detai
 
 - [Run](#run)
 
+- [Generate Dense Point Cloud](#generate-dense-point-cloud)
+
 
 ## Preface
 The package is primarily designed as an offline mapping module and the default parameters are optimized towards robustness and accuracy. The processing speed is highly dependent on the hardware used and the data acquisition environment. Typical processing times are 2-3 times the recording time.
@@ -129,3 +131,7 @@ After the package is started, RViz opens and displays the progress of the proces
 <img src="./doc/rviz_live.png" alt="drawing" width="600"/>
 <figcaption>Fig.3 - DMSA-SLAM in RViz.</figcaption>
 </figure>
+
+
+### Generate Dense Point Cloud
+If the resulting keyframe point cloud is too sparse for your application, the package [dense_cloud_creator](https://github.com/davidskdds/dense_cloud_creator.git) can be used to generate a dense point cloud including all point clouds in the rosbag.
