@@ -153,7 +153,7 @@ public:
         float infoDet = cov.inverse().determinant();
 
         // update score
-        score = score + std::log(1.0f + infoDet);
+        score = score + std::log(1.0f + std::abs(infoDet) );
 
         // limit covariance
         limitCovariance(cov);
