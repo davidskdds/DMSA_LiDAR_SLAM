@@ -23,6 +23,8 @@ For point cloud alignment, **Dense Multi Scan Adjustment** (DMSA) is used. Detai
 
 - [Prerequisites](#prerequisites) 
 
+- [Sample Data](#sample-data) 
+
 - [Installation](#installation)
 
 - [Setup](#setup)
@@ -71,7 +73,7 @@ You can also use the provided shell script, that will update your Eigen version 
 
 `sh helpers/updateEigenUbuntu20.04.sh`
 
-## Datasets
+## Sample Data
 Sequences from the Hilti 2022 Oxford Dataset and the Newer College Dataset were mainly used for the evaluations in the published paper.
 For these datasets, configurations are provided as launch files in this package so that the sequences can be processed directly after adapting the Rosbag file paths. The sequences of the Hilti 2022 Oxford Dataset can be downloaded [here](https://hilti-challenge.com/dataset-2022.html) and those of the Newer College Dataset [here](https://ori-drs.github.io/newer-college-dataset/).
 
