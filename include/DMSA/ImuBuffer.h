@@ -6,8 +6,8 @@
  * this file. If not, please write to: davidskuddis@web.de, or visit: https://opensource.org/license/mit/
  */
 
-#ifndef POINTCLOUD_H
-#define POINTCLOUD_H
+#ifndef IMUBUFFER_H
+#define IMUBUFFER_H
 
 #include <eigen3/Eigen/Core>
 

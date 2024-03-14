@@ -80,16 +80,16 @@ public:
     void addPoseToFile(double &stamp, Ref<Vector3d> pos, Ref<Vector3d> orient, std::ofstream &file)
     {
         // save timestamp
-        file << std::setprecision(3) << std::fixed << stamp << " ";
+        file << std::setprecision(6) << std::fixed << stamp << " ";
 
         // save translation parameters
-        file << std::setprecision(3) << std::fixed << pos(0) << " " << pos(1) << " " << pos(2) << " ";
+        file << std::setprecision(5) << std::fixed << pos(0) << " " << pos(1) << " " << pos(2) << " ";
 
         // calculate quaternion and save it
         Matrix3d R = axang2rotm(orient);
         Quaterniond q(R);
 
-        file << std::setprecision(3) << std::fixed << q.x() << " " << q.y() << " " << q.z() << " " << q.w();
+        file << std::setprecision(6) << std::fixed << q.x() << " " << q.y() << " " << q.z() << " " << q.w();
 
         // new row
         file << "\n";

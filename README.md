@@ -71,7 +71,9 @@ You can also use the provided shell script, that will update your Eigen version 
 
 `sh helpers/updateEigenUbuntu20.04.sh`
 
-
+## Datasets
+Sequences from the Hilti 2022 Oxford Dataset and the Newer College Dataset were mainly used for the evaluations in the published paper.
+For these datasets, configurations are provided as launch files in this package so that the sequences can be processed directly after adapting the Rosbag file paths. The sequences of the Hilti 2022 Oxford Dataset can be downloaded [here](https://hilti-challenge.com/dataset-2022.html) and those of the Newer College Dataset [here](https://ori-drs.github.io/newer-college-dataset/).
 
 ## Installation
 
@@ -88,7 +90,7 @@ You can also use the provided shell script, that will update your Eigen version 
 ## Setup
 The main SLAM settings are defined in `config/slam_settings.yaml` and should not have to be adjusted.
 
-The following changes are made in `config/custom.yaml`, `config/hilti2022.yaml`, `config/Ouster_LiDAR_NewerCollege_64.yaml` or `config/Ouster_LiDAR_NewerCollege_128.yaml`
+The following changes are made in `config/custom.yaml`, `config/hilti_2022.yaml`, `config/newer_college_ouster_64.yaml` or `config/newer_college_ouster_128.yaml`
 
 ### 1. Rosbag Directories (bag_dirs)
 The software processes the data directly from the Rosbag, there is no need to run "`rosbag play ...`". The path to the Rosbag must be specified to process the data.

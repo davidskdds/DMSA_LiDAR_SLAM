@@ -88,14 +88,13 @@ public:
         optimSettingsMap.gauss_split = true;
         optimSettingsMap.num_iter = config.num_iter_keyframe_optim;
         optimSettingsMap.max_step = 0.01;
-        //optimSettingsMap.step_length_optim = 0.05;
+        // optimSettingsMap.step_length_optim = 0.05;
         optimSettingsMap.decay_rate = config.decay_rate_key;
 
         optimSettingsMap.select_best_set = config.select_best_set_key;
         optimSettingsMap.min_num_gaussians = config.min_num_points_gauss_key;
         optimSettingsMap.grid_size_1_factor = 1.5f;
         optimSettingsMap.grid_size_1_factor = 2.0f;
-
     }
 
     void processImuMeasurements(Eigen::Vector3d &AccMeas, Eigen::Vector3d &AngVelMeas, double &stamp)
@@ -151,7 +150,10 @@ public:
 
         // INIT MAP
         if (KeyframeMap.isInitialized == false)
+        {
             initializeMap(*currTraj);
+            return;
+        }
 
         // add static points
         int minKeyframeId;
@@ -202,7 +204,7 @@ public:
 
     void savePoses(string result_dir)
     {
-        Output.saveDensePoses(KeyframeMap.keyframePoses,result_dir);
+        Output.saveDensePoses(KeyframeMap.keyframePoses, result_dir);
     }
 
 private:
@@ -461,7 +463,7 @@ private:
         {
             optimSettingsSlidingWindow.step_length_optim = config.alpha_sliding_window_no_imu;
             optimSettingsSlidingWindow.max_step = config.max_step_sliding_window_no_imu;
-            //optimSettingsSlidingWindow.decay_rate = 1.0;
+            // optimSettingsSlidingWindow.decay_rate = 1.0;
         }
     }
 
@@ -534,10 +536,13 @@ private:
             trajIn.getSubmapGravityEstimate(data.measuredGravity);
 
         // check gravity plausability
-        if (std::abs(data.measuredGravity.norm() - KeyframeMap.gravity.norm() ) < config.gravity_outlier_thresh ) data.gravityPlausible = true;
-        else data.gravityPlausible = false;
+        if (std::abs(data.measuredGravity.norm() - KeyframeMap.gravity.norm()) < config.gravity_outlier_thresh)
+            data.gravityPlausible = true;
+        else
+            data.gravityPlausible = false;
 
-        if (trajIn.validImuData == true && data.gravityPlausible == false) std::cout << "Discarded faulty gravity measurement . . . "<<std::endl;
+        if (trajIn.validImuData == true && data.gravityPlausible == false)
+            std::cout << "Discarded faulty gravity measurement . . . " << std::endl;
 
         std::cout << "Gravity estimation keyframe: " << (axang2rotm(trajIn.controlPoses.globalPoses.Orientations.col(0)) * data.measuredGravity).transpose() << std::endl;
 
@@ -622,7 +627,8 @@ private:
         pcl::transformPointCloud(*filteredPc, *filteredPc, config.lidarToImuTform);
 
         // set padding variable to 1
-        for (auto & point : filteredPc->points) point.data[3] = 1.0f;
+        for (auto &point : filteredPc->points)
+            point.data[3] = 1.0f;
 
         if (pcBuffer->getNumUpdates() % 10 == 0)
             std::cerr << "Grid size preprocessing: " << filteredPc->gridSize << " / num points: " << filteredPc->size() << "\n";
