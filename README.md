@@ -1,3 +1,4 @@
+<meta name="google-site-verification" content="Fvl5zYA3_MD7qUU-3nCBgY5YwgHpMyd9bGJr0UeA0FI" />
 # DMSA-SLAM
 DMSA LiDAR SLAM is a robust and accurate package for LiDAR and IMU based mapping. First point clouds within a sliding time window are optimized conjointly with so called static points from the map and IMU measurements. When a new keyframe is added to the map, related keyframes are optimized. Keyframes are stored in a ring buffer, therefore old keyframes are deleted from a certain map size.
 For point cloud alignment, **Dense Multi Scan Adjustment** (DMSA) is used. Details can be found in our [paper](https://arxiv.org/abs/2402.19044) (preprint, accepted for ICRA 2024).
