@@ -66,6 +66,8 @@ struct Config
     int min_num_points_gauss_key = 6;
 
     double gravity_outlier_thresh = 1.0;
+
+    int expected_max_num_static_pts = 200000;
 };
 
 #endif

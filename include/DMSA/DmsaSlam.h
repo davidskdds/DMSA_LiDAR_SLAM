@@ -52,25 +52,31 @@ public:
     DmsaOptimizer<PointStampId> slidingWindowOptimizer;
     DmsaOptimizer<PointNormal> keyframeMapOptimizer;
 
+    PointCloud<PointStampId>::Ptr staticPoints;
+
     int maxOverlapKeyId = 0;
     float overlapRatio = 0.0f;
 
     OutputManagement Output;
 
-    DmsaSlam(Config &inputConf) : config(inputConf), currTraj(new ContinuousTrajectory()), oldTraj(new ContinuousTrajectory()), pcBuffer(new PointCloudBuffer())
+    DmsaSlam(Config &inputConf) : config(inputConf), currTraj(new ContinuousTrajectory()), oldTraj(new ContinuousTrajectory()), pcBuffer(new PointCloudBuffer()), staticPoints(new PointCloud<PointStampId>())
     {
         pcBuffer->init(config.n_clouds);
 
         KeyframeMap = MapManagement(config.last_n_keyframes_for_optim);
+
+        staticPoints->reserve(config.expected_max_num_static_pts);
 
         initConfig();
     }
 
-    DmsaSlam() : currTraj(new ContinuousTrajectory()), oldTraj(new ContinuousTrajectory()), pcBuffer(new PointCloudBuffer())
+    DmsaSlam() : currTraj(new ContinuousTrajectory()), oldTraj(new ContinuousTrajectory()), pcBuffer(new PointCloudBuffer()), staticPoints(new PointCloud<PointStampId>())
     {
         pcBuffer->init(config.n_clouds);
 
         KeyframeMap = MapManagement(config.last_n_keyframes_for_optim);
+
+        staticPoints->reserve(config.expected_max_num_static_pts);
 
         initConfig();
     }
@@ -271,15 +277,15 @@ private:
         int currOverlap;
         int maxOverlapKey = 0;
         minRelatedKeyId = -1;
-        PointCloud<PointStampId>::Ptr staticPoints(new PointCloud<PointStampId>());
 
-        PointCloud<PointNormal>::Ptr tmpPtr(new PointCloud<PointNormal>()), filteredPc(new PointCloud<PointNormal>());
+        PointCloud<PointNormal>::Ptr tmpPtr(new PointCloud<PointNormal>());
 
         PointStampId tmpPt;
         tmpPt.id = -1;
         tmpPt.stamp = -1000.0;
 
-        staticPoints->reserve(20000);
+        // reset static points
+        staticPoints->resize(0);
 
         KdTreeFLANN<PointStampId> kdtree;
 
