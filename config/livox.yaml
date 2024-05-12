@@ -1,10 +1,10 @@
 ### Process your own rosbag/s ###
 
 # input (one rosbag path or multiple, diveded by space)
-bag_dirs: "/path/to/rosbag.bag"
+bag_dirs: "/home/david/Rosbags/Livox/test0_2024-05-09-16-30-17.bag"
 
 # output: save resulting poses and point cloud in directory (recommended: use home directory to do not run into permission issues)
-result_dir: "/home/USERNAME"
+result_dir: "/home/david/optim"
 
 # true: live viewer window will open (pcl-viewer), false: no live view
 live_view: true
@@ -12,12 +12,12 @@ live_view: true
 ## LiDAR SETTINGS
 
 # sensor type {"hesai","ouster","robosense","velodyne","livoxXYZRTLT_s","livoxXYZRTLT_ns","unknown"}
-sensor: "ouster"
-lidar_topic: "/ouster/points"
+sensor: "livoxXYZRTLT_ns"
+lidar_topic: "/livox/lidar"
 
 ## IMU SETTINGS
-use_imu: true
-imu_topic: "/ouster/imu"
+use_imu: false
+imu_topic: "/livox/imu"
 
 # IMU sensor noise (does not need to be adjusted in most cases)
 sigma_gyr: 0.003
@@ -38,3 +38,6 @@ q_w: 1.0
 t_x: 0.0
 t_y: 0.0
 t_z: 0.0
+
+# reduced point number for livox sensors
+max_num_points_per_scan: 1500
