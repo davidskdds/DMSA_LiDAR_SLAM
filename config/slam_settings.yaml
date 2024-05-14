@@ -82,4 +82,7 @@ dist_static_points_keyframe: 30.0
 # discard submap gravity estimates that are not plausible
 gravity_outlier_thresh: 1.0
 
+# set to true if the unit of acceleration measurements in imu messages is g (livox)
+acceleration_in_g: false
+
 

@@ -16,7 +16,7 @@ sensor: "livoxXYZRTLT_ns"
 lidar_topic: "/livox/lidar"
 
 ## IMU SETTINGS
-use_imu: false
+use_imu: true
 imu_topic: "/livox/imu"
 
 # IMU sensor noise (does not need to be adjusted in most cases)
@@ -41,3 +41,6 @@ t_z: 0.0
 
 # reduced point number for livox sensors
 max_num_points_per_scan: 1500
+
+# set to true if the unit of acceleration measurements in imu messages is g (livox)
+acceleration_in_g: true

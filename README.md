@@ -21,6 +21,8 @@ For point cloud alignment, **Dense Multi Scan Adjustment** (DMSA) is used. Detai
 
 - [Preface](#preface) 
 
+- [Supported Sensors](#supported-sensors) 
+
 - [Prerequisites](#prerequisites) 
 
 - [Sample Data](#sample-data) 
@@ -43,12 +45,13 @@ The package is primarily designed as an offline mapping module and the default p
 
 **Output:** Trajectory as Pose.txt file (TUM-format) and resulting keyframe point cloud as .pcd file
 
-The package can work with LiDAR data from the following manufacturers (the ROS drivers must be configured in such a way that time stamp and ring id are provided for each point):
-- Ouster
-- Hesai
-- Velodyne
-- Robosense
-- Livox
+## Supported Sensors
+The package can work with LiDAR data from the following manufacturers (the sensors ROS driver must be configured in such a way that time stamp and ring id are provided for each point):
+- **Ouster** (tested with OS0-128, OS1-64, OS1-128)
+- **Hesai** (tested with PandarXT-32)
+- **Velodyne** (tested with VLP-16)
+- **Robosense** (tested with RS-Bpearl)
+- **Livox** (tested with Mid-360)
 
 **Info for Livox-LiDARs:** Livox LiDARs are now also supported. To process point clouds from Livox LiDARs please record your data using the [livox_ros_driver2](https://github.com/Livox-SDK/livox_ros_driver2) and configure it to provide the points as PointCloud2-Messages in the PointXYZRTLT format. **Attention**: Currently there is a bug in the [livox_ros_driver2](https://github.com/Livox-SDK/livox_ros_driver2). The README states that the timestamps per point are in seconds, but they are actually in nanoseconds. Therefore, a sensor configuration with the name "livoxXYZRTLT_ns" is provided in this repo. For the case that the bug is fixed promptly and the timestamps are then available in seconds, an configuration "livoxXYZRTLT_s" is also provided.
 

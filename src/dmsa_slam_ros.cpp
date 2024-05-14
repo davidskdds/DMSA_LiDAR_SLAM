@@ -151,6 +151,10 @@ dmsa_slam_ros::dmsa_slam_ros()
     nh.getParam("gravity_outlier_thresh", config.gravity_outlier_thresh);
     std::cout << "gravity_outlier_thresh: " << config.gravity_outlier_thresh << std::endl;
 
+    bool acceleration_in_g = false;
+    nh.getParam("acceleration_in_g", acceleration_in_g);
+    std::cout << "acceleration_in_g: " << acceleration_in_g << std::endl;
+
     double sigma_gyr;
 
     nh.getParam("sigma_gyr", sigma_gyr);
@@ -225,6 +229,12 @@ dmsa_slam_ros::dmsa_slam_ros()
     pubSubmap = nh.advertise<sensor_msgs::PointCloud2>("/dmsa_slam/submap", 1);
     pubPose = nh.advertise<geometry_msgs::PoseStamped>("/dmsa_slam/pose", 1);
     pubTraj = nh.advertise<sensor_msgs::PointCloud2>("/dmsa_slam/traj", 1);
+
+    // livox imu acceleration scaling
+    if (acceleration_in_g)
+    {
+        accUnitScale = 9.81;
+    }
 
     DmsaSLAMObj = DmsaSlam(config);
 }
@@ -306,7 +316,7 @@ void dmsa_slam_ros::callbackImuData(const sensor_msgs::Imu::ConstPtr &msg)
 {
 
     // save measurements
-    Eigen::Vector3d accVec = Vector3d(msg->linear_acceleration.x, msg->linear_acceleration.y, msg->linear_acceleration.z);
+    Eigen::Vector3d accVec = accUnitScale*Vector3d(msg->linear_acceleration.x, msg->linear_acceleration.y, msg->linear_acceleration.z);
     Eigen::Vector3d angVelVec = Vector3d(msg->angular_velocity.x, msg->angular_velocity.y, msg->angular_velocity.z);
     double stamp = msg->header.stamp.toSec();
 

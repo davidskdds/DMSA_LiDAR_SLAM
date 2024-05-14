@@ -85,4 +85,5 @@ private:
   // config
   double lastPcMsgStamp = -1.0;
   double timeshift_to_imu0;
+  double accUnitScale = 1.0;
 };
