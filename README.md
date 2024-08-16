@@ -1,6 +1,19 @@
 # DMSA-SLAM
 DMSA LiDAR SLAM is a robust and accurate package for LiDAR and IMU based mapping. First point clouds within a sliding time window are optimized conjointly with so called static points from the map and IMU measurements. When a new keyframe is added to the map, related keyframes are optimized. Keyframes are stored in a ring buffer, therefore old keyframes are deleted from a certain map size.
-For point cloud alignment, **Dense Multi Scan Adjustment** (DMSA) is used. Details can be found in our [paper](https://arxiv.org/abs/2402.19044) (preprint, accepted for ICRA 2024).
+For point cloud alignment, **Dense Multi Scan Adjustment** (DMSA) is used. Details can be found in our paper ([IEEE](https://ieeexplore.ieee.org/document/10610818)/[arXiv](https://arxiv.org/abs/2402.19044)).
+
+If you use DMSA SLAM in an academic work, please cite:
+  ```bibtex
+  @INPROCEEDINGS{10610818,
+  author={Skuddis, David and Haala, Norbert},
+  booktitle={2024 IEEE International Conference on Robotics and Automation (ICRA)}, 
+  title={DMSA - Dense Multi Scan Adjustment for LiDAR Inertial Odometry and Global Optimization}, 
+  year={2024},
+  volume={},
+  number={},
+  pages={12027-12033},
+  doi={10.1109/ICRA57147.2024.10610818}}
+  ```
 
 **The use of IMU data is not mandatory, but recommended.**
 
@@ -16,6 +29,7 @@ For point cloud alignment, **Dense Multi Scan Adjustment** (DMSA) is used. Detai
 </p>
 <figcaption>Fig.2 - Running DMSA SLAM on the stairs sequence of the Newer College Dataset.</figcaption>
 </figure>
+
 
 # Contents
 
@@ -44,6 +58,7 @@ The package is primarily designed as an offline mapping module and the default p
 **Input:** Rosbag with LiDAR (PointCloud2-Messages) and IMU data
 
 **Output:** Trajectory as Pose.txt file (TUM-format) and resulting keyframe point cloud as .pcd file
+
 
 ## Supported Sensors
 The package can work with LiDAR data from the following manufacturers (the sensors ROS driver must be configured in such a way that time stamp and ring id are provided for each point):
