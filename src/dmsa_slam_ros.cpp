@@ -112,8 +112,8 @@ dmsa_slam_ros::dmsa_slam_ros()
     nh.getParam("last_n_keyframes_for_optim", config.last_n_keyframes_for_optim);
     std::cout << "last_n_keyframes_for_optim: " << config.last_n_keyframes_for_optim << std::endl;
 
-    nh.getParam("oldest_k_keyframes_as_static_points", config.oldest_k_keyframes_as_static_points);
-    std::cout << "oldest_k_keyframes_as_static_points: " << config.oldest_k_keyframes_as_static_points << std::endl;
+    nh.getParam("closest_k_keyframes_as_static_points", config.closest_k_keyframes_as_static_points);
+    std::cout << "closest_k_keyframes_as_static_points: " << config.closest_k_keyframes_as_static_points << std::endl;
 
     nh.getParam("alpha_keyframe_optim", config.alpha_keyframe_optim);
     std::cout << "alpha_keyframe_optim: " << config.alpha_keyframe_optim << std::endl;

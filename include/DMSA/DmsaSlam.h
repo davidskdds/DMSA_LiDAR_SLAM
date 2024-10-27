@@ -297,12 +297,11 @@ private:
 
         float sqrdMaxDist = std::pow(1.0f * trajIn.minGridSize, 2);
 
-        for (int k = 0; k < KeyframeMap.keyframeDataBuffer.getNumElements(); ++k)
+        // get closest keyframes
+        std::vector<int> closestKeyIds = KeyframeMap.getClosestNIds(currPos,config.closest_k_keyframes_as_static_points);
+
+        for (int& k : closestKeyIds)
         {
-            if (k < KeyframeMap.keyframeDataBuffer.getNumElements() - config.oldest_k_keyframes_as_static_points)
-            {
-                continue;
-            }
 
             double distToKeyframe = (currPos - KeyframeMap.keyframePoses.globalPoses.Translations.col(k)).norm();
 
@@ -334,7 +333,7 @@ private:
                                 // update overlap
                                 ++currOverlap;
 
-                                if (minRelatedKeyId < 0)
+                                if (minRelatedKeyId < 0 || k < minRelatedKeyId)
                                     minRelatedKeyId = k;
                             }
                         }

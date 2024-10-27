@@ -41,7 +41,7 @@ alpha_sliding_window_no_imu: 0.3
 max_step_sliding_window_imu: 0.01
 max_step_sliding_window_no_imu: 0.2
 
-oldest_k_keyframes_as_static_points: 100
+closest_k_keyframes_as_static_points: 3
 
 ## KEYFRAME OPTIMIZATION
 

@@ -85,6 +85,38 @@ public:
         keyframePoses.relative2global();
     }
 
+    std::vector<int> getClosestNIds(Vector3d pos_w, int n = 5)
+    {
+        struct distancesIds
+        {
+            double dist;
+            int id;
+        };
+
+        std::vector<distancesIds> distancesWithIds(keyframeDataBuffer.getNumElements());
+
+        for (int k = 0; k < keyframeDataBuffer.getNumElements(); ++k)
+        {
+            distancesWithIds[k].dist = (keyframePoses.globalPoses.Translations.col(k)-pos_w).norm();
+            distancesWithIds[k].id = k;
+        }
+
+        sort( distancesWithIds.begin( ), distancesWithIds.end( ), [ ]( const auto& lhs, const auto& rhs )
+        {
+            return lhs.dist < rhs.dist;
+        });
+
+        std::vector<int> result;
+
+        for (int k = 0; k < std::min(keyframeDataBuffer.getNumElements(), n); ++k )
+        {
+            result.push_back(distancesWithIds[k].id);
+        }
+
+        return result;
+
+    }
+
     void updateGlobalPoints()
     {
         int globalId = 0;

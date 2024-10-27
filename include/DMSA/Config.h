@@ -34,7 +34,7 @@ struct Config
     double dist_static_points_keyframe = 30.0;
     double min_overlap_new_keyframe = 0.75;
     int num_iter_sliding_window_optim = 15;
-    int oldest_k_keyframes_as_static_points = 10;
+    int closest_k_keyframes_as_static_points = 10;
     float min_dist = 0.0;
 
     double dt_res = 0.001;
