@@ -657,8 +657,8 @@ public:
 
             // save
             imuFactorError(k - 1) = combined_error.transpose() * CovPVRot_inv[k] * combined_error;
-
             imuFactorError(k - 1) *= balancingImu;
+            imuFactorError(k - 1) = std::sqrt(imuFactorError(k - 1));
         }
     }
 

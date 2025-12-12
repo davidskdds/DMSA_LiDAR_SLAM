@@ -227,6 +227,7 @@ public:
             // save
             gravityErrorTerm(k) = diffVec.transpose() * Cov_grav_inv * diffVec;
             gravityErrorTerm(k) *= balancingFactorGrav;
+            gravityErrorTerm(k) = std::sqrt(gravityErrorTerm(k));
         }
     }
 
@@ -245,8 +246,8 @@ public:
 
             odometryErrorTerm(k - 1) += translDiff.transpose() * odometryTranslCovInv * translDiff;
             odometryErrorTerm(k - 1) += orientDiff.transpose() * odometryOrientCovInv * orientDiff;
-
             odometryErrorTerm(k - 1) *= balancingFactorOdom;
+            odometryErrorTerm(k - 1) = std::sqrt(odometryErrorTerm(k - 1));
         }
     }
 

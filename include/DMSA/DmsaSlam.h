@@ -85,7 +85,6 @@ public:
     {
         optimSettingsSlidingWindow.num_iter = config.num_iter_sliding_window_optim;
         optimSettingsSlidingWindow.min_num_points_per_set = config.min_num_points_gauss;
-        optimSettingsSlidingWindow.decay_rate = config.decay_rate_sw;
 
         optimSettingsMap.min_num_points_per_set = config.min_num_points_gauss;
         optimSettingsMap.step_length_optim = config.alpha_keyframe_optim;
@@ -94,11 +93,7 @@ public:
         optimSettingsMap.gauss_split = true;
         optimSettingsMap.num_iter = config.num_iter_keyframe_optim;
         optimSettingsMap.max_step = 0.01;
-        // optimSettingsMap.step_length_optim = 0.05;
-        optimSettingsMap.decay_rate = config.decay_rate_key;
-
-        optimSettingsMap.select_best_set = config.select_best_set_key;
-        optimSettingsMap.min_num_gaussians = config.min_num_points_gauss_key;
+        optimSettingsMap.min_num_points_per_set = config.min_num_points_gauss_key;
         optimSettingsMap.grid_size_1_factor = 1.5f;
         optimSettingsMap.grid_size_1_factor = 2.0f;
     }
@@ -468,7 +463,6 @@ private:
         {
             optimSettingsSlidingWindow.step_length_optim = config.alpha_sliding_window_no_imu;
             optimSettingsSlidingWindow.max_step = config.max_step_sliding_window_no_imu;
-            // optimSettingsSlidingWindow.decay_rate = 1.0;
         }
     }
 

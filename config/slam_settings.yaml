@@ -10,7 +10,7 @@ min_distance_ds: 30.0
 min_dist: 0.1
 
 # minimum number of points for valid gaussian
-min_num_points_gauss: 10
+min_num_points_gauss: 7
 
 # keyframe conditions
 dist_new_keyframe: 5.0
@@ -19,16 +19,13 @@ min_overlap_new_keyframe: 0.75
 ## SLIDING WINDOW CONTINOUS TRAJECTORY SETTINGS
 
 # number of iterations
-num_iter_sliding_window_optim: 8
+num_iter_sliding_window_optim: 10
 
 # number of clouds for submap optimization 5-10
 num_clouds_submap: 5
 
 # number of control poses for sliding window continuous trajectory
 num_control_poses: 6
-
-# decay rate for optimization
-decay_rate_sw: 0.8
 
 # imu weight in sliding window optimization
 imu_factor_weight_submap: 0.001
@@ -48,9 +45,6 @@ closest_k_keyframes_as_static_points: 3
 # true: keyframes will be optimized / false: no keyframe optimization
 optimize_sliding_window_keyframes: true
 
-# true: select parameter set with highest score / false: select final parameter set after last optimization step
-select_best_set_key: true
-
 # minimum number of points in voxel to use set in optimization
 min_num_points_gauss_key: 10
 
@@ -59,9 +53,6 @@ alpha_keyframe_optim: 0.2
 
 # number of iterations
 num_iter_keyframe_optim: 50
-
-# decay rate of gain in keyframe optimization
-decay_rate_key: 0.8
 
 # epsilon for stop condition in keyframe optimization
 epsilon_keyframe_opt: 0.0001

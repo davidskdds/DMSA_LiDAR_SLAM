@@ -28,7 +28,7 @@ struct DmsaOptimSettings
     double epsilon = 1e-5;
     bool use_analytic_jacobi = false;
     double step_length_optim = 0.05;
-    double max_step = 0.03;
+    double max_step = 0.01;
     bool gauss_split = false;
     float grid_size_1_factor = 2.0;
     float grid_size_2_factor = 5.0;
@@ -36,8 +36,6 @@ struct DmsaOptimSettings
     int min_num_gaussians = 30;
     float lambda_diag = 0.00001;
     bool use_centralization = true;
-    float decay_rate = 0.7;
-    bool select_best_set = false;
 };
 
 template <typename PointT>
@@ -61,7 +59,6 @@ public:
         VectorXd paramVec, paramVecBestSet;
         VectorXd errorVec, optimStep;
         double maxElem;
-        double adaptiveAlpha{1.0}, lastMeanScore{0.0}, currMeanScore, maxScore;
 
         // get min and max id
         updateMinMaxId(pointSetToOptimize);
@@ -88,27 +85,6 @@ public:
             if (settings.grid_size_2_factor > std::numeric_limits<float>::min())
                 createGaussianSets(pointSetToOptimize, settings.grid_size_2_factor * pointSetToOptimize.minGridSize, settings.min_num_points_per_set, settings.gauss_split);
 
-            // calc mean score
-            currMeanScore = currentGauss.score / static_cast<float>(currentGauss.numPointSets);
-
-            if (iter == 0)
-            {
-                lastMeanScore = currMeanScore;
-                maxScore = currMeanScore;
-                pointSetToOptimize.getPoseParameters(paramVecBestSet);
-            }
-
-            if (currMeanScore > maxScore)
-            {
-                maxScore = currMeanScore;
-                paramVecBestSet = paramVec;
-            }
-
-            // reduce adaptive alpha
-            if (currMeanScore < lastMeanScore)
-                adaptiveAlpha *= settings.decay_rate;
-
-            lastMeanScore = currMeanScore;
 
             if (currentGauss.numPointSets < settings.min_num_gaussians)
             {
@@ -122,6 +98,8 @@ public:
             // update errors
             updateErrorTerms(pointSetToOptimize, errorVec);
 
+            double error0 = errorVec.transpose() * errorVec;
+
             // update Jacobian
             calcNumericJacobian(Jacobian, errorVec, pointSetToOptimize);
 
@@ -132,7 +110,7 @@ public:
             H.diagonal().array() += settings.lambda_diag;
 
             // LM optimization step
-            optimStep = -adaptiveAlpha * settings.step_length_optim * H.inverse() * Jacobian.transpose() * errorVec;
+            optimStep = -settings.step_length_optim * H.inverse() * Jacobian.transpose() * errorVec;
 
             // stop in case of nan
             if (optimStep.array().isNaN().any())
@@ -149,8 +127,11 @@ public:
             if (maxElem > settings.max_step)
                 optimStep = (settings.max_step / maxElem) * optimStep;
 
-            // add to current trajectory
-            paramVec = paramVec + optimStep.cast<double>();
+            if (adaptiveStepSize(pointSetToOptimize, paramVec, optimStep, error0) == 0)
+            {
+                std::cout << "Stop optimization because of no improvements after iteration " << iter << " . . . " << std::endl;
+                break;
+            }
 
             pointSetToOptimize.setPoseParameters(paramVec);
 
@@ -162,13 +143,42 @@ public:
             }
         }
 
-        if (settings.select_best_set == true)
-            pointSetToOptimize.setPoseParameters(paramVecBestSet);
-
         if (settings.use_centralization)
             pointSetToOptimize.decentralize();
 
         pointSetToOptimize.updateGlobalPoints();
+    }
+
+    int adaptiveStepSize(OptimizablePointSet<PointT> &pointSetToOptimize, Eigen::VectorXd &params, const Eigen::VectorXd &step, double error0)
+    {
+        double minError = error0;
+        int bestStepLength = 0;
+
+        Eigen::VectorXd rawParams = params;
+        VectorXd errorVec;
+
+        for (int k = 1; k < 10; ++k)
+        {
+            Eigen::VectorXd paramTest = rawParams + 0.1 * static_cast<double>(k) * step;
+
+            // set test params
+            pointSetToOptimize.setPoseParameters(paramTest);
+
+            pointSetToOptimize.updateGlobalPoints();
+
+            updateErrorTerms(pointSetToOptimize, errorVec);
+
+            double errorTest = errorVec.transpose() * errorVec;
+
+            if (errorTest < minError)
+            {
+                params = paramTest;
+                minError = errorTest;
+                bestStepLength = k;
+            }
+        }
+
+        return bestStepLength;
     }
 
 protected:
@@ -250,8 +260,11 @@ protected:
             {
                 diffVec = pointSetToOptimize.globalPoints.points[currentGauss.connectedPointIds[k](j)].getVector3fMap() - mean;
 
-                errorVec(k) += static_cast<double>(currentGauss.rebalancingWeights(k) * diffVec.transpose() * currentGauss.infoMats[k] * diffVec);
+                errorVec(k) +=  static_cast<double>(currentGauss.rebalancingWeights(k))*diffVec.transpose() * currentGauss.infoMats[k] * diffVec ;
             }
+
+            // normalize
+            errorVec(k) = std::sqrt(std::abs(errorVec(k)));
         }
 
         // update additional error terms

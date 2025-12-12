@@ -93,8 +93,6 @@ public:
     VectorXf rebalancingWeights;
     VectorXf obervationWeights;
 
-
-    float score;
     bool limited_cov = false;
 
     int numPointSets = 0;
@@ -127,9 +125,6 @@ public:
 
         numPointSets = 0;
         numPoints = 0;
-
-        score = 0.000;
-
     }
 
     void addPointSet(std::vector<int> &ids, MatrixX3f &subset, float observationWeight = 1.0)
@@ -151,9 +146,6 @@ public:
         MatrixXf centered = subset.rowwise() - subset.colwise().mean();
         Matrix3f cov = (centered.adjoint() * centered) / float(subset.rows() - 1);
         float infoDet = cov.inverse().determinant();
-
-        // update score
-        score = score + std::log(1.0f + std::abs(infoDet) );
 
         // limit covariance
         limitCovariance(cov);

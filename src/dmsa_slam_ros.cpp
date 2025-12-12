@@ -39,12 +39,6 @@ dmsa_slam_ros::dmsa_slam_ros()
     nh.getParam("max_num_points_per_scan", config.max_num_points_per_scan);
     std::cout << "max_num_points_per_scan: " << config.max_num_points_per_scan << std::endl;
 
-    nh.getParam("decay_rate_sw", config.decay_rate_sw);
-    std::cout << "decay_rate_sw: " << config.decay_rate_sw << std::endl;
-
-    nh.getParam("decay_rate_key", config.decay_rate_key);
-    std::cout << "decay_rate_key: " << config.decay_rate_key << std::endl;
-
     nh.getParam("min_distance_ds", config.minDistDS);
     std::cout << "min_distance_ds: " << config.minDistDS << std::endl;
 
@@ -385,6 +379,7 @@ void dmsa_slam_ros::callbackPointCloud(const sensor_msgs::PointCloud2::ConstPtr 
 
     int arrayPosition;
     uint8_t ring_tmp8;
+    int8_t ring_int8;
     uint16_t ring_tmp;
     uint32_t relStampNano;
     double stampMsg = msg->header.stamp.toSec();
@@ -470,6 +465,15 @@ void dmsa_slam_ros::callbackPointCloud(const sensor_msgs::PointCloud2::ConstPtr 
 
             // add artificial ring index
             newPC->at(k).id = k % 1000;
+        }
+        else if (config.sensor == "sick")
+        {
+            // stamp and ring
+            memcpy(&tmpStampFloat, &msg->data[arrayPosition + msg->fields[8].offset], sizeof(float));
+            memcpy(&ring_int8, &msg->data[arrayPosition + msg->fields[11].offset], sizeof(int8_t));
+
+            newPC->at(k).stamp = stampMsg + static_cast<double>(tmpStampFloat);
+            newPC->at(k).id = static_cast<int>(ring_int8);
         }
         else if (config.sensor == "unknown")
         {
