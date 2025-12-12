@@ -10,7 +10,7 @@ min_distance_ds: 30.0
 min_dist: 0.1
 
 # minimum number of points for valid gaussian
-min_num_points_gauss: 7
+min_num_points_gauss: 10
 
 # keyframe conditions
 dist_new_keyframe: 5.0
@@ -32,11 +32,11 @@ imu_factor_weight_submap: 0.001
 
 # gains in optimization
 alpha_sliding_window_imu: 0.07
-alpha_sliding_window_no_imu: 0.3
+alpha_sliding_window_no_imu: 0.2
 
 # maximum step size in optimization
 max_step_sliding_window_imu: 0.01
-max_step_sliding_window_no_imu: 0.2
+max_step_sliding_window_no_imu: 0.3
 
 closest_k_keyframes_as_static_points: 3
 
